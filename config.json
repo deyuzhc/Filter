@@ -1,0 +1,43 @@
+{
+  "model": {
+    "mode": "predict",
+    "train_data_dir": "data/train_data/",
+    "test_data_dir": "data/test_data/",
+    "model_dir": "data/model/",
+    "pred_img_path": "./",
+    "k": 11,
+    "queueSize": 1,
+    "shape": [
+      {
+        "weights": 8,
+        "conv": 5
+      },
+      {
+        "weights": 100,
+        "conv": 5
+      },
+      {
+        "weights": 100,
+        "conv": 5
+      },
+      {
+        "weights": 100,
+        "conv": 5
+      },
+      {
+        "weights": 100,
+        "conv": 5
+      },
+      {
+        "weights": 100,
+        "conv": 5
+      }
+    ],
+    "batch_width": 50,
+    "batch_height": 50,
+    "batchs": 1,
+    "maxCacheSize": 1,
+    "learning_rate": 1e-6,
+    "max_round": 320
+  }
+}
