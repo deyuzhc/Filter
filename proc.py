@@ -1,3 +1,4 @@
+#!/bin/local/python3
 #encoding:utf-8
 '''
 处理模块
