@@ -1,0 +1,33 @@
+{
+  "mode": "train",
+  "batch_n": 1,
+  "batch_h": 80,
+  "batch_w": 80,
+  "cache_size": 800,
+  "conv_size": 5,
+  "features": 8,
+  "subfeatures": 2,
+  "max_round": 80000,
+  "plot_width": 1000,
+  "plot_high": 20,
+  "learning_rate": 1e-2,
+  "txt_input": "data.txt",
+  "img_output": "truth.png",
+  "conf_input": "config.json",
+  "loss_func": "l1",
+  "model_path": "data/model/",
+  "cnn_name": [ "global", "caustic" ],
+  "model_name": "model",
+  "optimizer": "Adam",
+  "test_data": "data/test/staircase2/",
+  "train_data": "data/train/",
+  "weights_shape": [ 10, 100, 100, 100, 100, 100, 169],
+  "active_func": [
+    "leaky_relu",
+    "leaky_relu",
+    "leaky_relu",
+    "leaky_relu",
+    "leaky_relu",
+    "leaky_relu"
+  ]
+}
