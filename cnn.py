@@ -1,3 +1,4 @@
+#!/bin/local/python3
 #encoding:utf-8
 '''
 根据模型配置对象(feed)构建模型
