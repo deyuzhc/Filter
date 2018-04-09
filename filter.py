@@ -1,3 +1,4 @@
+#!/bin/local/python3
 #encoding:utf-8
 '''
 proc的子类，负责图像滤波
