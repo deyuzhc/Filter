@@ -1,3 +1,4 @@
+#!/bin/local/python3
 #encoding:utf-8
 '''
 CNN测试模块
