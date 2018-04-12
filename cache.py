@@ -87,7 +87,7 @@ class Cache:
     '''
     def remove(self,key=None):
         keys = list(self.__data.keys())
-        print(keys)
+        # print(keys)
         if len(keys) == 0:
             return
         key = keys[0] if key == None else key
