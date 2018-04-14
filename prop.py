@@ -6,7 +6,6 @@
 import utils
 import tensorflow as tf
 from cache import Cache
-from multiprocessing import Queue
 
 
 class Prop:
@@ -53,12 +52,10 @@ class Prop:
         # channels of image
         self.__properties['cols'] = self.getAttr('cols', 3, self.__properties['CONFIG_FILE'])
         # message queue
-        # self.__properties['queue'] = utils.getQueue()
         self.__properties['plot_high'] = self.getAttr('plot_high', 300, self.__properties['CONFIG_FILE'])
         self.__properties['plot_width'] = self.getAttr('plot_width', 100, self.__properties['CONFIG_FILE'])
-        self.__properties['session'] = tf.Session()
+        self.__properties['session'] = None  # utils.getSession()
         self.__properties['cache'] = Cache(self.queryAttr('cache_size'))
-        # print(self.__properties['queue'])
 
     ############################
     #########外部函数###########
@@ -111,10 +108,6 @@ class Prop:
         result += '# [cnn_name]:\t\t' + str(self.__properties['cnn_name']) + '\n'
         result += '# [ckpt_name]:\t\t[\'' + str(self.__properties['ckpt_name']) + '\']\n'
         result += '# [data_dir]:\t\t[\'' + str(self.__properties['data_dir']) + '\']\n'
-        # result+='# [txt_input]:\t\t[\'' + str(self.__properties['txt_input'])
-        # + '\']\n'
-        # result+='# [img_input]:\t\t[\'' + str(self.__properties['img_input'])
-        # + '\']\n'
         result += '# [conf_input]:\t\t[\'' + str(self.__properties['conf_input']) + '\']\n'
         result += '# [ground_truth]:\t[\'' + str(self.__properties['ground_truth']) + '\']\n'
         result += '# [cache_size]:\t\t[' + str(self.__properties['cache_size']) + 'M]\n'
@@ -151,8 +144,8 @@ class Prop:
         内部接口，更新属性值
     @param
         name:   属性名
-        default:缺省值
+        value:缺省值
     '''
 
-    def setAttr(self, name, default):
-        self.__properties[name] = default
+    def setAttr(self, name, value):
+        self.__properties[name] = value

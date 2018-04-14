@@ -36,10 +36,11 @@ class Proc:
     @about
         收尾工作
     @param
+        input1:输入数据
     @return
     '''
 
-    def postprocess(self):
+    def postprocess(self, input1):
         raise NotImplementedError
 
     '''
