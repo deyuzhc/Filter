@@ -64,7 +64,7 @@ class CNN:
         # 卷积网络模型参数
         self.__conv_size = prop.queryAttr('conv_size')
         self.__model_path = prop.queryAttr('model_path')
-        self.__model_name = prop.queryAttr('model_name')
+        self.__ckpt_name = prop.queryAttr('ckpt_name')
         self.__active_func = prop.queryAttr('active_func')
         self.__weights_shape = prop.queryAttr('weights_shape')
         self.__isTrain = True if prop.needTrain() else False
@@ -230,7 +230,7 @@ class CNN:
             self.sendMsg([0, xloss])
 
             if i % 100 == 99:
-                self.save(self.__model_path, self.__model_name)
+                self.save(self.__model_path, self.__ckpt_name)
             i += 1
 
         # max_round > 0
@@ -244,7 +244,7 @@ class CNN:
             self.sendMsg([i / self.__max_round, xloss])
 
             if i % 100 == 99:
-                self.save(self.__model_path, self.__model_name)
+                self.save(self.__model_path, self.__ckpt_name)
 
     '''
     @about

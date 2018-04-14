@@ -4,29 +4,27 @@
 IO调度模块，用于cache管理
 
 说明：
-    此模块的主要目标是根据调度策略，优化文件加载过程
+    此模块的主要任务是开启文件加载线程
     将文件切分为batch粒度，放入训练数据消息队列
     训练时，feed模块从队列中获取，使cache透明
     将所有场景文件组织为一个环形链
     长时间调用此模块后，可保证所有场景有近似的访问频率
-    按照不等待原则，根据缓存中存在的场景文件进行调度
 
 基本策略：
 两个线程循环执行：
-    生产者:加载一个场景到cache中，使用cache的主要意义在于可以控制内存占用，垃圾回收不依赖Python的机制
+    生产者:加载一个场景到cache中，
+    使用cache的主要意义在于可以控制内存占用，垃圾回收不依赖Python的机制
     生产者:按照切片规则将场景切片，取一定数量放入缓冲区（缓冲区满时阻塞），加载下一个场景
     消费者:将缓冲区中的切片放入消息队列，队列满时阻塞
 
 '''
-
-from threading import Thread
 
 import os
 import utils
 import queue
 import numpy as np
 
-
+from threading import Thread
 
 # 调度类
 class IOsched:
@@ -57,7 +55,7 @@ class IOsched:
         self.__features = prop.queryAttr('features')
         self.__ifeatures = prop.queryAttr('ifeatures')
         self.__batch_c = self.__features + self.__ifeatures
-        self.__img_output = prop.queryAttr('img_output')
+        self.__ground_truth = prop.queryAttr('ground_truth')
         # cache
         self.__cache = prop.queryAttr('cache')
         # size of image
@@ -121,7 +119,7 @@ class IOsched:
             assert(txt[0].shape == txt[1].shape)
             assert(image[0].shape == image[1].shape)
             if self.__mode == 'train':
-                truthname = self.__img_output
+                truthname = self.__ground_truth
                 t = self.getCacheItem(path + truthname)
             else:
                 assert(self.__mode == 'infer')
@@ -218,10 +216,7 @@ class IOsched:
         # preprocess data 
         ret[1] = self.Sigmoid(ret[1])
         ret[3] = self.Sigmoid(ret[3])
-        
-        #self.__logger.debug('scene splited.')
-        #ret[0] = ret[2] = ret[4] = np.ones([1,bh,bw,cols])
-        #ret[1] = ret[3] = np.ones([1,bh,bw,bc])
+
         return ret
 
 
@@ -234,7 +229,6 @@ class IOsched:
         layer,offset,size:[dy,dx]
     '''
     def getSplitParams(self,scene):
-        #self.__logger.debug('getting split params...')
         imgkey = len(scene.keys()) - 1   # truth img
         ih = scene[imgkey].shape[1]
         iw = scene[imgkey].shape[2]
@@ -268,7 +262,6 @@ class IOsched:
         value:cache的键值
     '''
     def getCacheItem(self,key):
-        #self.__logger.debug('getting item from cache...')
         try:
             value = self.__cache.get(key)
         except:
@@ -283,7 +276,6 @@ class IOsched:
                     self.__ih = value.shape[1]
                     self.__iw = value.shape[2]
             self.__cache.add(key,value)
-        #self.__logger.debug('item get.')
         return value
 
 

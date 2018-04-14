@@ -1,18 +1,19 @@
 #!/bin/local/python3
-#encoding:utf-8
+# encoding:utf-8
 '''
 处理模块
 抽象类，抽象程序的处理流程
 '''
 
-class Proc:
 
+class Proc:
     '''
     @about
         构造函数
     @param
     @return
     '''
+
     def __init(self, *args, **kwargs):
         raise NotImplementedError
 
@@ -25,7 +26,8 @@ class Proc:
     @return
         val1、val2:作为process的输入
     '''
-    def preprocess(self,input1,input2):
+
+    def preprocess(self, input1, input2):
         # the 'preprocess' function should return 2
         # values as the input of function 'process'
         raise NotImplementedError
@@ -36,6 +38,7 @@ class Proc:
     @param
     @return
     '''
+
     def postprocess(self):
         raise NotImplementedError
 
@@ -48,7 +51,8 @@ class Proc:
         input2:输入值2
     @return
     '''
-    def process(self,input1,input2):
+
+    def process(self, input1, input2):
         raise NotImplementedError
 
     '''
@@ -59,6 +63,7 @@ class Proc:
     @return
         [n1,h1,w1,c1],[n2,h2,w2,c2]
     '''
+
     def getBatchShapes(self):
         raise NotImplementedError
 
@@ -67,13 +72,16 @@ class Proc:
 与处理模块相对应的数据提供模块
 抽象类，抽象数据提供的流程
 '''
+
+
 class Feed:
     '''
     @about
     @param
     @return
     '''
-    def __init__(self,*args, **kwargs):
+
+    def __init__(self, *args, **kwargs):
         raise NotImplementedError
 
     '''
@@ -82,6 +90,7 @@ class Feed:
     @param
     @return
     '''
+
     def getInputdata(self):
         raise NotImplementedError
 
@@ -93,6 +102,7 @@ class Feed:
     @return
         根据对应Proc进行输出
     '''
+
     def next_batch(self):
         raise NotImplementedError
 
@@ -102,7 +112,8 @@ class Feed:
     @param
     @return
     '''
-    def checkMatch(self,a,b,c):
+
+    def checkMatch(self, a, b, c):
         raise NotImplementedError
 
     '''
@@ -111,29 +122,26 @@ class Feed:
     @param
     @return
     '''
+
     def getBatchShapes(self):
         raise NotImplementedError
 
     '''
     @about
+        归一化
     @param
     @return
     '''
-    def normalize(self,a):
+
+    def normalize(self, a):
         raise NotImplementedError
 
     '''
     @about
+        输出内容为字符串
     @param
     @return
     '''
-    def isTrainMode(self):
-        raise NotImplementedError
 
-    '''
-    @about
-    @param
-    @return
-    '''
     def toString(self):
         raise NotImplementedError
