@@ -22,12 +22,13 @@
 
 import os
 import utils
+import colorama
 import platform
 import tensorflow as tf
 
 from proc import Feed
 from proc import Proc
-from termcolor import colored
+from termcolor import cprint
 from tensorflow.python.framework.ops import Tensor
 
 
@@ -80,6 +81,7 @@ class CNN:
             self.__optimizer = prop.queryAttr('optimizer')
         else:
             self.__batch_n = 1
+        colorama.init()
 
     '''
     @about
@@ -203,7 +205,7 @@ class CNN:
         self.__logger.debug('training...')
         assert (isinstance(proc, Proc))
         assert (isinstance(feed, Feed))
-        assert (self. __isTrain)
+        assert (self.__isTrain)
 
         in1shape, in2shape = proc.getBatchShapes()
 
@@ -347,7 +349,7 @@ class CNN:
         if type == 'l1':
             result = tf.reduce_mean(tf.abs(tf.subtract(input, output)))
         elif type == 'cross_entropy':
-            # 此类型表现不佳
+            # 此方式表现不佳
             result = tf.reduce_mean(-tf.reduce_sum(output * tf.log(input)))
         else:
             assert (False)
@@ -392,7 +394,7 @@ class CNN:
             self.__logger.info('directory \'%s\' was made for model saving.' % path)
         except OSError:
             if not os.path.isdir(path):
-                self.__logger.error(colored('target path is not a directory', 'red'))
+                self.__logger.error(cprint('target path is not a directory', 'red'))
                 return False
         saver = tf.train.Saver()
         saver.save(self.__sess, path + name)
@@ -416,19 +418,19 @@ class CNN:
                 saver = tf.train.Saver(save_relative_paths=True)
                 saver.restore(self.__sess, ckpt)
             except:
-                self.__logger.warn(colored(
+                self.__logger.warn(cprint(
                     'model[%s] mismatch! current checkpoint will be overwriten,do you want to continue?' % self.__name,
                     'yellow'))
                 cands = ['y', 'yes', 'n', 'no']
                 deci = ''
                 while not (deci in cands):
-                    deci = input(colored('y or n:', 'yellow'))
+                    deci = input(cprint('y or n:', 'yellow'))
                     if deci == 'y' or deci == 'yes':
                         return False
                     elif deci == 'n' or deci == 'no':
                         exit(-1)
                     else:
-                        self.__logger.warn(colored('invalid input,please try again...', 'yellow'))
+                        self.__logger.warn(cprint('invalid input,please try again...', 'yellow'))
                 return False
             self.__logger.info('model restored from the latest checkpoint.')
         else:
