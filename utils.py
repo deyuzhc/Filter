@@ -1,5 +1,5 @@
 #!/bin/local/python3
-#encoding:utf-8
+# encoding:utf-8
 '''
 logger模块
 文件存取
@@ -11,18 +11,12 @@ import cv2
 import json
 import queue
 import logging
-
 import numpy as np
 import scipy.misc as spm
 
-import platform
-
-from tensorflow.python.framework.ops import Tensor
-
 from hashlib import md5
 from PIL import Image
-
-from multiprocessing import Queue
+from tensorflow.python.framework.ops import Tensor
 
 '''
 @about
@@ -32,11 +26,13 @@ from multiprocessing import Queue
 @return
     全局唯一logger
 '''
+
+
 def getLogger():
     global logger
     try:
         return logger
-    except:        
+    except:
         logger = logging.getLogger()
         fmt = logging.Formatter('[%(asctime)s][%(threadName)s][%(levelname)s][%(module)s] %(message)s')
         handler = logging.StreamHandler(sys.stdout)
@@ -54,6 +50,8 @@ def getLogger():
 @return
     queue
 '''
+
+
 def getQueue(name='default'):
     global q_dict
     try:
@@ -67,7 +65,6 @@ def getQueue(name='default'):
     return q_dict[name]
 
 
-
 '''
 @about
     读取并解析json文件，返回指定属性的值
@@ -76,7 +73,9 @@ def getQueue(name='default'):
     name:   属性名
     default:缺省值
 '''
-def getJsonAttr(name,default,filename):
+
+
+def getJsonAttr(name, default, filename):
     global result
     try:
         with open(filename) as f:
@@ -94,6 +93,8 @@ def getJsonAttr(name,default,filename):
 @return
     RGB于[0,255]之间，图像[1,h,w,c]
 '''
+
+
 def readIMG(filename):
     image = Image.open(filename)
     data = image.getdata()
@@ -102,8 +103,8 @@ def readIMG(filename):
         for c in p:
             result.append(c)
     channels = 3
-    assert(len(result) / (image.height * image.width) == channels)
-    result = np.reshape(result,[1,image.height,image.width,channels])
+    assert (len(result) / (image.height * image.width) == channels)
+    result = np.reshape(result, [1, image.height, image.width, channels])
     # return result / 255
     return result
 
@@ -117,6 +118,8 @@ def readIMG(filename):
 @return
     返回读入的文本
 '''
+
+
 def readTXT(filename, shape=None):
     logger = getLogger()
     logger.debug('loading txt:%s...' % filename)
@@ -137,19 +140,21 @@ def readTXT(filename, shape=None):
 @return
     整数，以B为单位的大小
 '''
+
+
 def getSize(item):
     size = 0
-    if isinstance(item,dict):
+    if isinstance(item, dict):
         for name in item.keys():
-            size+=getSize(item[name])
-    elif isinstance(item,np.ndarray):
-        size+=item.nbytes
-    elif isinstance(item,list):
+            size += getSize(item[name])
+    elif isinstance(item, np.ndarray):
+        size += item.nbytes
+    elif isinstance(item, list):
         for itm in item:
-            size+=getSize(itm)
+            size += getSize(itm)
     else:
-        assert(not isinstance(item,Tensor))
-        size+=sys.getsizeof(item)
+        assert (not isinstance(item, Tensor))
+        size += sys.getsizeof(item)
     return int(size)
 
 
@@ -163,12 +168,14 @@ def getSize(item):
 @return
     指定大小的截取值
 '''
-def slice(src,begin,size):
-    assert(isinstance(src,np.ndarray))
-    assert(isinstance(begin,list))
-    assert(isinstance(size,list))
-    assert(len(src.shape) == len(begin))
-    assert(len(src.shape) == len(size))
+
+
+def slice(src, begin, size):
+    assert (isinstance(src, np.ndarray))
+    assert (isinstance(begin, list))
+    assert (isinstance(size, list))
+    assert (len(src.shape) == len(begin))
+    assert (len(src.shape) == len(size))
     sn = begin[0]
     sh = begin[1]
     sw = begin[2]
@@ -177,8 +184,9 @@ def slice(src,begin,size):
     dh = size[1]
     dw = size[2]
     dc = size[3]
-    result = src[sn:sn + dn,sh:sh + dh,sw:sw + dw,sc:sc + dc]
+    result = src[sn:sn + dn, sh:sh + dh, sw:sw + dw, sc:sc + dc]
     return result
+
 
 '''
 @about
@@ -189,19 +197,22 @@ def slice(src,begin,size):
 @return
     magnitued:[n,h,w,1]
 '''
+
+
 def getMagnitude(input):
     n = input.shape[0]
     h = input.shape[1]
     w = input.shape[2]
-    mag = np.ones([n,h,w,1])
+    mag = np.ones([n, h, w, 1])
     lum = getLuminance(input)
     for i in range(n):
-        layer = np.reshape(lum[i],[h,w])
-        dx = cv2.Sobel(layer,cv2.CV_64F,1,0,ksize=5)
-        dy = cv2.Sobel(layer,cv2.CV_64F,0,1,ksize=5)
-        cm = cv2.magnitude(dx,dy)
-        mag[i] = np.reshape(cm,[h,w,1])
+        layer = np.reshape(lum[i], [h, w])
+        dx = cv2.Sobel(layer, cv2.CV_64F, 1, 0, ksize=5)
+        dy = cv2.Sobel(layer, cv2.CV_64F, 0, 1, ksize=5)
+        cm = cv2.magnitude(dx, dy)
+        mag[i] = np.reshape(cm, [h, w, 1])
     return mag
+
 
 '''
 @about
@@ -211,14 +222,16 @@ def getMagnitude(input):
 @return
     [n,h,w,1]
 '''
+
+
 def getLuminance(input):
-    assert(len(input.shape) == 4)
+    assert (len(input.shape) == 4)
     n = input.shape[0]
     h = input.shape[1]
     w = input.shape[2]
-    trans = np.array([0.299,0.587,0.114])
-    result = np.sum(input * trans,-1)
-    result = np.reshape(result,[n,h,w,1])
+    trans = np.array([0.299, 0.587, 0.114])
+    result = np.sum(input * trans, -1)
+    result = np.reshape(result, [n, h, w, 1])
     return result
 
 
@@ -230,12 +243,15 @@ def getLuminance(input):
 @return
     文件的行数
 '''
+
+
 def getLines(filename):
     lines = -1
-    for lines,line in enumerate(open(filename)):
+    for lines, line in enumerate(open(filename)):
         pass
-    lines+=1
+    lines += 1
     return lines
+
 
 '''
 @about
@@ -245,9 +261,11 @@ def getLines(filename):
 @return
     md5校验和
 '''
+
+
 def md5sum(filename):
     m = md5()
-    file = open(filename,'rb')
+    file = open(filename, 'rb')
     line = file.readline()
     while line:
         m.update(line)
@@ -255,8 +273,6 @@ def md5sum(filename):
     file.close()
     lower = m.hexdigest()
     return lower.upper()
-
-
 
 
 '''
@@ -268,19 +284,22 @@ def md5sum(filename):
 @return
     None
 '''
-def saveImage(data,filename):
+
+
+def saveImage(data, filename):
     logger = getLogger()
     src = data.astype(np.uint8)
     if len(src.shape) == 4:
-        assert(src.shape[0]) == 1
+        assert (src.shape[0]) == 1
         h = src.shape[1]
         w = src.shape[2]
         c = src.shape[3]
-        src = np.reshape(src,[h,w,c])
+        src = np.reshape(src, [h, w, c])
     else:
-        assert(len(src.shape) == 3)
+        assert (len(src.shape) == 3)
     spm.toimage(src).save(filename)
     logger.debug('image saved to \'%s\'' % filename)
+
 
 '''
 @about
@@ -292,24 +311,20 @@ def saveImage(data,filename):
 @return
     None
 '''
-def displayImage(*img,title='result'):
+
+
+def displayImage(*img, title='result'):
     from matplotlib import pyplot as plt
-    assert(isinstance(i,np.ndarray) for i in img)
+    assert (isinstance(i, np.ndarray) for i in img)
     plt.title(title)
     sum = len(img)
     nh = int(np.sqrt(sum))
     nw = int(np.ceil(sum / nh))
     for i in range(sum):
-        assert(len(img[i].shape) == 4)
-        image = np.reshape(img[i],[img[i].shape[1],img[i].shape[2],img[i].shape[3]])
-        plt.subplot(nh,nw,i + 1)
+        assert (len(img[i].shape) == 4)
+        image = np.reshape(img[i], [img[i].shape[1], img[i].shape[2], img[i].shape[3]])
+        plt.subplot(nh, nw, i + 1)
         plt.title(str(i))
         # plt.imshow(image)
         plt.imshow(image.astype(np.uint8))
     plt.show()
-
-    #if len(img.shape) == 4:
-    #    assert(img.shape[0] == 1)
-    #    image = np.reshape(img,[img.shape[1],img.shape[2],img.shape[3]])
-    #plt.imshow(image)
-    #plt.show()
