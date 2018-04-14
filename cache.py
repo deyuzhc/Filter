@@ -1,16 +1,13 @@
 #!/bin/local/python3
-#encoding:utf-8
+# encoding:utf-8
 '''
 自定义Cache，仅用于支持numpy对象
 '''
 
-import os
-import sys
-import numpy as np
-
 import utils
 
 from termcolor import colored
+
 
 class Cache:
     '''
@@ -24,14 +21,14 @@ class Cache:
     @return
         None
     '''
-    def __init__(self,max_size):
+
+    def __init__(self, max_size):
         self.__data = {}
         self.__max_size = max_size
         self.__MB = 1048576
         self.__in = 0
         self.__sum = 0
         self.__logger = utils.getLogger()
-
 
     '''
     @about
@@ -41,10 +38,11 @@ class Cache:
     @return
         exception / value
     '''
-    def get(self,name):
-        self.__sum+=1
+
+    def get(self, name):
+        self.__sum += 1
         if self.isContain(name):
-            self.__in+=1
+            self.__in += 1
             # self.__logger.debug('Cache hit')
         else:
             self.__logger.debug('Cache miss')
@@ -61,21 +59,21 @@ class Cache:
     @return
         None
     '''
-    def add(self,name,value):
+
+    def add(self, name, value):
         if self.isContain(name):
             return
         curSize = self.getSize()
         if curSize + utils.getSize(value) / self.__MB > self.__max_size:
             try:
                 self.remove()
-                self.add(name,value)
+                self.add(name, value)
                 self.__logger.debug('one item poped!')
             except:
-                self.__logger.error(colored('Cache is too small to hold this one item!','red'))
+                self.__logger.error(colored('Cache is too small to hold this one item!', 'red'))
                 exit(-1)
         else:
             self.__data[name] = value
-
 
     '''
     @about 
@@ -85,14 +83,13 @@ class Cache:
     @return
         None
     '''
-    def remove(self,key=None):
+
+    def remove(self, key=None):
         keys = list(self.__data.keys())
-        # print(keys)
         if len(keys) == 0:
             return
         key = keys[0] if key == None else key
         del self.__data[key]
-
 
     '''
     @about
@@ -102,10 +99,10 @@ class Cache:
     @return
         None
     '''
+
     def clear(self):
         for i in self.__data:
             del i
-
 
     '''
     @about
@@ -115,9 +112,9 @@ class Cache:
     @return
         True/False，包含关系
     '''
-    def isContain(self,name):
-        return name in self.__data.keys()
 
+    def isContain(self, name):
+        return name in self.__data.keys()
 
     '''
     @about
@@ -127,10 +124,11 @@ class Cache:
     @return
         返回以M为单位的大小
     '''
+
     def getSize(self):
         size = 0
         for name in self.__data.keys():
-            size+=utils.getSize(self.__data[name])
+            size += utils.getSize(self.__data[name])
         return int(size / self.__MB)
 
     '''
@@ -141,6 +139,7 @@ class Cache:
     @return
         eta:Cache命中率
     '''
+
     def getEta(self):
-        eta = self.__in / max(1.0,self.__sum)
+        eta = self.__in / max(1.0, self.__sum)
         return eta
