@@ -48,6 +48,7 @@ class CNN:
         self.__logger = utils.getLogger()
         # 全局唯一会话
         self.__sess = prop.queryAttr('session')
+        # self.__sess = utils.getSession()
         # 卷积网络的字符串命名
         self.__name = name
         # 消息队列，用于中转训练误差数据
@@ -420,9 +421,9 @@ class CNN:
                 saver = tf.train.Saver(save_relative_paths=True)
                 saver.restore(self.__sess, ckpt)
             except:
-                self.__logger.warn(cprint(
+                cprint(
                     'model[%s] mismatch! current checkpoint will be overwriten,do you want to continue?' % self.__name,
-                    'yellow'))
+                    'yellow')
                 cands = ['y', 'yes', 'n', 'no']
                 deci = ''
                 while not (deci in cands):
@@ -432,7 +433,7 @@ class CNN:
                     elif deci == 'n' or deci == 'no':
                         exit(-1)
                     else:
-                        self.__logger.warn(cprint('invalid input,please try again...', 'yellow'))
+                        self.__logger.warn('invalid input,please try again...')
                 return False
             self.__logger.info('model restored from the latest checkpoint.')
         else:

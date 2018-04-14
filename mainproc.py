@@ -8,6 +8,7 @@ from proc import Proc
 from proc import Feed
 from filter import Filter
 from filter import FilterFeed
+from threading import Thread
 from cnn import CNN
 
 import utils
@@ -23,34 +24,50 @@ import tensorflow as tf
 class MainProc(Proc):
     '''
     @about
-        创建两个卷积网络对象
+        构造函数，只接受参数，不进行初始化
+        初始化在线程内完成
     @param
         prop:程序配置模块
     @return
         None
     '''
 
-    def __init__(self, prop, msg_queue=None):
+    def __init__(self, prop, feed, msg_queue=None):
         self.__logger = utils.getLogger()
-        self.__isTrain = prop.needTrain()
-        self.__sess = prop.queryAttr('session')
-
+        self.__prop = prop
+        self.__feed = feed
         self.__msg_queue = msg_queue
 
-        self.__output_path = prop.queryAttr('data_dir')
-        self.__model_path = prop.queryAttr('model_path')
-        self.__ckpt_name = prop.queryAttr('ckpt_name')
-        self.__cnn_name = prop.queryAttr('cnn_name')
-        self.__batch_n = prop.queryAttr('batch_n')
-        self.__batch_h = prop.queryAttr('batch_h')
-        self.__batch_w = prop.queryAttr('batch_w')
-        self.__batch_c = prop.queryAttr('features') + prop.queryAttr('ifeatures')
-        self.__cols = prop.queryAttr('cols')
+    '''
+    @about
+        创建两个卷积网络对象
+    @param
+        prop:程序配置对象
+        feed:数据提供对象
+        msg_queue:消息队列
+    @return
+        None
+    '''
+
+    def init(self):
+        self.__isTrain = self.__prop.needTrain()
+        self.__sess = tf.Session()
+        self.__prop.updateAttr('session', self.__sess)
+
+        self.__output_path = self.__prop.queryAttr('data_dir')
+        self.__model_path = self.__prop.queryAttr('model_path')
+        self.__ckpt_name = self.__prop.queryAttr('ckpt_name')
+        self.__cnn_name = self.__prop.queryAttr('cnn_name')
+        self.__batch_n = self.__prop.queryAttr('batch_n')
+        self.__batch_h = self.__prop.queryAttr('batch_h')
+        self.__batch_w = self.__prop.queryAttr('batch_w')
+        self.__batch_c = self.__prop.queryAttr('features') + self.__prop.queryAttr('ifeatures')
+        self.__cols = self.__prop.queryAttr('cols')
 
         # global photon cnn
         self.__global_fea = tf.placeholder(tf.float32, [self.__batch_n, self.__batch_h, self.__batch_w, self.__batch_c])
         self.__global_img = tf.placeholder(tf.float32, [self.__batch_n, self.__batch_h, self.__batch_w, self.__cols])
-        self.__globalCNN = CNN(prop, self.__cnn_name[0])
+        self.__globalCNN = CNN(self.__prop, self.__cnn_name[0])
         self.__globalCNN.build(self.__global_img, self.__global_fea)
         # self.__globalCNN.init()
 
@@ -58,14 +75,44 @@ class MainProc(Proc):
         self.__caustic_fea = tf.placeholder(tf.float32,
                                             [self.__batch_n, self.__batch_h, self.__batch_w, self.__batch_c])
         self.__caustic_img = tf.placeholder(tf.float32, [self.__batch_n, self.__batch_h, self.__batch_w, self.__cols])
-        self.__causticCNN = CNN(prop, self.__cnn_name[1])
+        self.__causticCNN = CNN(self.__prop, self.__cnn_name[1])
         self.__causticCNN.build(self.__caustic_img, self.__caustic_fea)
         # self.__causticCNN.init()
 
         # other configuration in train mode
         if self.__isTrain:
-            self.__max_round = prop.queryAttr('max_round')
-            self.__learning_rate = prop.queryAttr('learning_rate')
+            self.__max_round = self.__prop.queryAttr('max_round')
+            self.__learning_rate = self.__prop.queryAttr('learning_rate')
+
+    '''
+    @about
+        线程调用入口
+        封装此模块主要流程
+    @param
+        None
+    @return
+        None
+    '''
+
+    def run(self):
+        self.init()
+        predict = self.preprocess(self.__prop)
+        result = self.process(self.__feed, predict)
+        self.postprocess(result)
+
+    '''
+    @about
+        开启守护线程，执行此模块主要逻辑
+    @param
+        None
+    @return
+        None
+    '''
+
+    def start(self):
+        wrk = Thread(target=self.run, args=(), name='Worker')
+        wrk.setDaemon(True)
+        wrk.start()
 
     '''
     @about
@@ -94,7 +141,7 @@ class MainProc(Proc):
         预测值，Tensor
     '''
 
-    def preprocess(self, prop, input2=None):
+    def preprocess(self, prop):
         self.__logger.debug('preprocessing...')
         # filter images separately
         glob = self.__globalCNN.process(Filter(prop))
@@ -180,6 +227,7 @@ class MainProc(Proc):
                     self.__globalCNN.save(ckpt_global, self.__ckpt_name)
                     self.__causticCNN.save(ckpt_caustic, self.__ckpt_name)
 
+
         # output directly when in infer mode
         else:
             self.__logger.debug('inferring...')
@@ -193,6 +241,8 @@ class MainProc(Proc):
 
             return result
 
+        return None
+
     '''
     @about
         process之后执行
@@ -202,12 +252,15 @@ class MainProc(Proc):
         None
     '''
 
-    def postprocess(self, input):
+    def postprocess(self, input1):
         self.__logger.debug('postprocessing...')
-        # path of test data file
-        save_path = self.__output_path
-        utils.saveImage(input, save_path + 'infer.png')
-        # utils.displayImage(input)
+        if not self.__isTrain:
+            # path of test data file
+            save_path = self.__output_path
+            utils.saveImage(input1, save_path + 'infer.png')
+            # utils.displayImage(input)
+
+        utils.setFlag('nowExit', True)
 
 
 '''

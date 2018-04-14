@@ -17,6 +17,7 @@ import scipy.misc as spm
 
 from hashlib import md5
 from PIL import Image
+
 from tensorflow.python.framework.ops import Tensor
 
 '''

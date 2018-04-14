@@ -23,15 +23,19 @@ if platform.system() == 'Windows':
 def handler(sig, frame):
     logger = utils.getLogger()
     logger.info('closing...patient...')
-    #while not utils.getFlag('safeExit'):
-    #    pass
-    #exit(0)
+
+    while not utils.getFlag('safeExit'):
+        pass
+    exit(1)
 
 
 def main(argv=None):
     # 全局唯一日志句柄
     logger = utils.getLogger()
+    # 是否可打断当前的操作
     utils.setFlag('safeExit', True)
+    # 是否退出当前程序
+    utils.setFlag('nowExit', False)
 
     # 处理SIGINT信号
     signal.signal(signal.SIGINT, handler)
@@ -50,13 +54,13 @@ def main(argv=None):
     sched.start()
 
     # 任务处理对象
-    mainproc = MainProc(prop, msg_queue)
     mainfeed = MainFeed(prop, data_queue)
+    mainproc = MainProc(prop, mainfeed, msg_queue)
+    mainproc.start()
 
-    # 任务处理
-    predict = mainproc.preprocess(prop, None)
-    result = mainproc.process(mainfeed, predict)
-    mainproc.postprocess(result)
+    # 主线程等待终止消息或信号
+    while not utils.getFlag('nowExit'):
+        pass
 
 
 if __name__ == '__main__':
