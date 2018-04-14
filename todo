@@ -1,6 +1,7 @@
-1.termcolor模块在windows上不兼容，待换为通用方法输出带颜色字符串
+#1.termcolor模块在windows上不兼容，待换为通用方法输出带颜色字符串
 2.cache仅能容纳一个txt文件时会发生抖动问题
 3.生成checkpoint时维护一个对应的metadata，标明模型结构与训练次数
 4.添加信号处理功能，在程序异常终止时保证checkpoint写入完成后再退出
 5.iosched模块中的文件校验代码未添加
 6.iosched中对输入数据进行预处理函数的选取
+#7.cache从顶部删除数据
