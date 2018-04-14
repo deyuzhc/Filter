@@ -196,6 +196,7 @@ class MainProc(Proc):
             self.__globalCNN.init(ckpt_global)
             self.__causticCNN.init(ckpt_caustic)
 
+            self.__save_round = 2
             # restore networks
             for i in range(self.__max_round):
 
@@ -223,9 +224,9 @@ class MainProc(Proc):
                     self.__logger.info('round:%d of inf,loss:%f...' % (i + 1, xloss))
 
                 # save result
-                if i % 5 == 4:
-                    self.__globalCNN.save(ckpt_global, self.__ckpt_name)
-                    self.__causticCNN.save(ckpt_caustic, self.__ckpt_name)
+                if i % self.__save_round == (self.__save_round - 1):
+                    self.__globalCNN.save(ckpt_global, self.__ckpt_name, self.__save_round)
+                    self.__causticCNN.save(ckpt_caustic, self.__ckpt_name, self.__save_round)
 
 
         # output directly when in infer mode

@@ -130,6 +130,40 @@ def getJsonAttr(name, default, filename):
 
 '''
 @about
+    读入json文件
+@param
+    filename:文件名
+@return
+    json数据
+'''
+
+
+def readJson(filename):
+    with open(filename) as f:
+        ret = json.load(f)
+    return ret
+
+
+'''
+@about
+    写出json到文件
+@param
+    content:dict类型
+    filename:目标文件
+@return
+    None
+'''
+
+
+def writeJson(content, filename):
+    isinstance(content, dict)
+    with open(filename, 'w') as f:
+        json.dump(content, f)
+    return True
+
+
+'''
+@about
     读图片文件，像素各通道值位于[0,255]之间
 @param
     filename:图像路径
