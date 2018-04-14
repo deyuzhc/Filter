@@ -11,17 +11,30 @@ from mainproc import MainProc
 from mainproc import MainFeed
 
 import utils
-import tensorflow as tf
+import signal
 import platform
+import tensorflow as tf
 
 if platform.system() == 'Windows':
     from irender import iRender
     import winsound as ws
 
 
+def handler(sig, frame):
+    logger = utils.getLogger()
+    logger.info('closing...patient...')
+    #while not utils.getFlag('safeExit'):
+    #    pass
+    #exit(0)
+
+
 def main(argv=None):
     # 全局唯一日志句柄
     logger = utils.getLogger()
+    utils.setFlag('safeExit', True)
+
+    # 处理SIGINT信号
+    signal.signal(signal.SIGINT, handler)
 
     # 配置对象
     prop = Prop()

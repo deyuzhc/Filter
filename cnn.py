@@ -388,6 +388,7 @@ class CNN:
     '''
 
     def save(self, path, name):
+        utils.setFlag('safeExit', False)
         self.__logger.info('saving model[%s]...' % self.__name)
         try:
             os.makedirs(path)
@@ -399,6 +400,7 @@ class CNN:
         saver = tf.train.Saver()
         saver.save(self.__sess, path + name)
         self.__logger.info('model[%s] saved.' % self.__name)
+        utils.setFlag('safeExit', True)
         return True
 
     '''

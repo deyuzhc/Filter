@@ -176,13 +176,13 @@ class MainProc(Proc):
                     self.__logger.info('round:%d of inf,loss:%f...' % (i + 1, xloss))
 
                 # save result
-                if i % 100 == 99:
-                    self.__globalCNN.save(ckpt_global, self.__model_name)
-                    self.__causticCNN.save(ckpt_caustic, self.__model_name)
+                if i % 5 == 4:
+                    self.__globalCNN.save(ckpt_global, self.__ckpt_name)
+                    self.__causticCNN.save(ckpt_caustic, self.__ckpt_name)
 
         # output directly when in infer mode
         else:
-            self.__logger.debug('infering...')
+            self.__logger.debug('inferring...')
 
             self.__globalCNN.init(ckpt_global)
             self.__causticCNN.init(ckpt_caustic)

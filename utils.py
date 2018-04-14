@@ -11,6 +11,7 @@ import cv2
 import json
 import queue
 import logging
+import threading
 import numpy as np
 import scipy.misc as spm
 
@@ -63,6 +64,47 @@ def getQueue(name='default'):
             q_dict = {}
             q_dict[name] = queue.Queue(80)
     return q_dict[name]
+
+
+'''
+@about
+    设置全局标记的值
+    使用互斥锁防止冲突
+@param
+    name:标记名
+    value:值
+@return
+    None
+'''
+
+
+def setFlag(name, value):
+    global globalFlags
+    try:
+        type(globalFlags)
+    except:
+        globalFlags = {}
+    mutex = threading.Lock()
+    if mutex.acquire():
+        globalFlags[name] = value
+    mutex.release()
+
+
+'''
+@about
+    获取全局标记的值
+@param
+    name:标记名
+@return
+    标记的值/None
+'''
+
+
+def getFlag(name):
+    try:
+        return globalFlags[name]
+    except:
+        return None
 
 
 '''
@@ -287,6 +329,7 @@ def md5sum(filename):
 
 
 def saveImage(data, filename):
+    setFlag('safeExit', False)
     logger = getLogger()
     src = data.astype(np.uint8)
     if len(src.shape) == 4:
@@ -299,6 +342,7 @@ def saveImage(data, filename):
         assert (len(src.shape) == 3)
     spm.toimage(src).save(filename)
     logger.debug('image saved to \'%s\'' % filename)
+    setFlag('safeExit', True)
 
 
 '''
