@@ -194,7 +194,7 @@ class IOsched:
     '''
 
     def splitScene(self, scene, layer, offset, size):
-        # self.__logger.debug('spliting scene...')
+        # self.__logger.debug('splitting scene...')
         ret = {}
         bn = self.__batch_n
         bh = self.__batch_h
