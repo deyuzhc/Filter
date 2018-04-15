@@ -187,6 +187,79 @@ class CNN:
         except:
             self.__logger.error('message queue is not specified.')
 
+    '''
+    @about
+        存储
+    @param
+        path:文件路径
+    @return
+        True/False
+    '''
+
+    def save(self, path, name, save_round):
+        utils.setFlag('safeExit', False)
+        self.__logger.info('saving model[%s]...' % self.__name)
+        try:
+            os.makedirs(path)
+            self.__logger.info('directory \'%s\' was made for model saving.' % path)
+        except OSError:
+            if not os.path.isdir(path):
+                self.__logger.error(cprint('target path is not a directory', 'red'))
+                return False
+        saver = tf.train.Saver()
+        saver.save(self.__sess, path + name)
+        try:
+            meta = utils.readJson(path + + 'meta.json')
+        except:
+            meta = {}
+            meta['name'] = name
+            meta['weights'] = 'tmp'
+            meta['active_func'] = 'tmp'
+            meta['round'] = save_round
+
+        meta['round'] += save_round
+        utils.writeJson(meta, path + 'meta.json')
+        self.__logger.info('model[%s] saved.' % self.__name)
+        utils.setFlag('safeExit', True)
+        return True
+
+    '''
+    @about
+        恢复
+    @param
+        path:文件路径
+    @return
+        True/False
+    '''
+
+    def restore(self, path):
+        if os.path.exists(path + '/checkpoint'):
+            ckpt = tf.train.latest_checkpoint(path)
+            self.__logger.debug('checkpoint path is \'%s\'' % ckpt)
+            try:
+                saver = tf.train.Saver(save_relative_paths=True)
+                saver.restore(self.__sess, ckpt)
+            except:
+                cprint(
+                    'model[%s] mismatch! current checkpoint will be overwriten,do you want to continue?' % self.__name,
+                    'yellow')
+                cands = ['y', 'yes', 'n', 'no']
+                deci = ''
+                while not (deci in cands):
+                    deci = input(cprint('y or n:', 'yellow'))
+                    if deci == 'y' or deci == 'yes':
+                        return False
+                    elif deci == 'n' or deci == 'no':
+                        exit(-1)
+                    else:
+                        self.__logger.warn('invalid input,please try again...')
+                return False
+            self.__logger.info('model restored from the latest checkpoint.')
+        else:
+            self.__logger.warn('checkpoint not found!')
+            return False
+        return True
+
     ############################
     ##########内部函数###########
     #######内部调用或调试使用######
@@ -378,76 +451,3 @@ class CNN:
             assert (False)
         self.__logger.debug('optimizer built.')
         return result
-
-    '''
-    @about
-        存储
-    @param
-        path:文件路径
-    @return
-        True/False
-    '''
-
-    def save(self, path, name, save_round):
-        utils.setFlag('safeExit', False)
-        self.__logger.info('saving model[%s]...' % self.__name)
-        try:
-            os.makedirs(path)
-            self.__logger.info('directory \'%s\' was made for model saving.' % path)
-        except OSError:
-            if not os.path.isdir(path):
-                self.__logger.error(cprint('target path is not a directory', 'red'))
-                return False
-        saver = tf.train.Saver()
-        saver.save(self.__sess, path + name)
-        try:
-            meta = utils.readJson(path + +'meta.json')
-        except:
-            meta = {}
-            meta['name'] = name
-            meta['weights'] = 'tmp'
-            meta['active_func'] = 'tmp'
-            meta['round'] = save_round
-
-        meta['round'] += save_round
-        utils.writeJson(meta, path + 'meta.json')
-        self.__logger.info('model[%s] saved.' % self.__name)
-        utils.setFlag('safeExit', True)
-        return True
-
-    '''
-    @about
-        恢复
-    @param
-        path:文件路径
-    @return
-        True/False
-    '''
-
-    def restore(self, path):
-        if os.path.exists(path + '/checkpoint'):
-            ckpt = tf.train.latest_checkpoint(path)
-            self.__logger.debug('checkpoint path is \'%s\'' % ckpt)
-            try:
-                saver = tf.train.Saver(save_relative_paths=True)
-                saver.restore(self.__sess, ckpt)
-            except:
-                cprint(
-                    'model[%s] mismatch! current checkpoint will be overwriten,do you want to continue?' % self.__name,
-                    'yellow')
-                cands = ['y', 'yes', 'n', 'no']
-                deci = ''
-                while not (deci in cands):
-                    deci = input(cprint('y or n:', 'yellow'))
-                    if deci == 'y' or deci == 'yes':
-                        return False
-                    elif deci == 'n' or deci == 'no':
-                        exit(-1)
-                    else:
-                        self.__logger.warn('invalid input,please try again...')
-                return False
-            self.__logger.info('model restored from the latest checkpoint.')
-        else:
-            self.__logger.warn('checkpoint not found!')
-            return False
-        return True
