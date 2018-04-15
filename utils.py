@@ -54,16 +54,16 @@ def getLogger():
 '''
 
 
-def getQueue(name='default'):
+def getQueue(name='default', size=80):
     global q_dict
     try:
         return q_dict[name]
     except:
         try:
-            q_dict[name] = queue.Queue(80)
+            q_dict[name] = queue.Queue(size)
         except:
             q_dict = {}
-            q_dict[name] = queue.Queue(80)
+            q_dict[name] = queue.Queue(size)
     return q_dict[name]
 
 
