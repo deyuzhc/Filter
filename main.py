@@ -26,7 +26,7 @@ def handler(sig, frame):
 
     while not utils.getFlag('safeExit'):
         pass
-    exit(1)
+    utils.setFlag('nowExit', True)
 
 
 def main(argv=None):
