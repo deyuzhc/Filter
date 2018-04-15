@@ -7,7 +7,7 @@
   "conv_size": 5,
   "features": 8,
   "ifeatures": 2,
-  "max_round": 80000,
+  "max_round": 6,
   "plot_width": 1000,
   "plot_high": 20,
   "learning_rate": 1e-2,
@@ -15,12 +15,22 @@
   "conf_input": "config.json",
   "loss_func": "l1",
   "model_path": "data/model/",
-  "cnn_name": [ "global", "caustic" ],
+  "cnn_name": [
+    "global",
+    "caustic"
+  ],
   "ckpt_name": "model",
-  "optimizer": "Adam",
   "test_data": "data/test/staircase2/",
   "train_data": "data/train/",
-  "weights_shape": [ 10, 100, 100, 100, 100, 100, 169],
+  "weights_shape": [
+    10,
+    100,
+    100,
+    100,
+    100,
+    100,
+    169
+  ],
   "active_func": [
     "leaky_relu",
     "leaky_relu",
