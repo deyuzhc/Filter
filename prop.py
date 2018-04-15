@@ -4,10 +4,16 @@
 程序属性模块
 '''
 import utils
-import tensorflow as tf
 from cache import Cache
 
+# 单例模式装饰器
+def singleton(cls):
+    instance = cls()
+    instance.__call__ = lambda: instance
+    return instance
 
+
+@singleton
 class Prop:
     def __init__(self):
         self.__logger = utils.getLogger()
