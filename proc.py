@@ -137,12 +137,3 @@ class Feed:
     def normalize(self, a):
         raise NotImplementedError
 
-    '''
-    @about
-        输出内容为字符串
-    @param
-    @return
-    '''
-
-    def toString(self):
-        raise NotImplementedError
