@@ -8,7 +8,14 @@ import utils
 
 from termcolor import colored
 
+# 单例模式装饰器
+def singleton(cls):
+    instance = cls()
+    instance.__call__ = lambda: instance
+    return instance
 
+
+@singleton
 class Cache:
     '''
     @about
