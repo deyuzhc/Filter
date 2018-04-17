@@ -1,9 +1,10 @@
 #!/bin/python3
 # encoding:utf-8
 '''
-用于全局共享的对象
+用于管理全局共享数据的对象
 '''
 
+import logging
 import threading
 
 
@@ -24,9 +25,12 @@ class Shared:
     @return
         None
     '''
+
     def __init__(self):
         # 全局共享变量集合
         self.__vars = {}
+        # 当前使用一把锁已足够
+        self.__vars['mutex'] = threading.Lock()
 
     '''
     @about
@@ -40,13 +44,12 @@ class Shared:
     '''
 
     def incFlag(self, name):
-        mutex = threading.Lock()
-        mutex.acquire()
+        self.__vars['mutex'].acquire()
         try:
             self.__vars[name] += 1
         except:
             self.__vars[name] = 1
-        mutex.release()
+        self.__vars['mutex'].release()
 
     '''
     @about
@@ -58,11 +61,12 @@ class Shared:
     '''
 
     def decFlag(self, name):
+        self.__vars['mutex'].acquire()
         try:
             self.__vars[name] -= 1
         except:
             self.__vars[name] = -1
-
+        self.__vars['mutex'].release()
 
     '''
     @about
@@ -73,7 +77,10 @@ class Shared:
     @return
         None
     '''
-    def addVar(self,name,value):
+
+    def addVar(self, name, value):
+        if name in self.__vars.keys():
+            assert (False)
         self.__vars[name] = value
 
     '''
@@ -84,13 +91,13 @@ class Shared:
     @return
         None
     '''
-    def delVar(self,name):
-        try:
-            del self.__vars[name]
-        except:
-            pass
 
-    
+    def delVar(self, name):
+        if name in self.__vars.keys():
+            del self.__vars[name]
+        else:
+            raise KeyError
+
     '''
     @about
         返回全局logging
@@ -98,44 +105,16 @@ class Shared:
         None
     @return
         全局共享logger
-'''
+    '''
 
-
-    def getLogger():
-        global logger
+    def getLogger(self):
         try:
-            return logger
+            return self.__vars['logger']
         except:
-            logger = logging.getLogger()
+            self.__vars['logger'] = logging.getLogger()
             fmt = logging.Formatter('[%(asctime)s][%(threadName)s][%(levelname)s][%(module)s] %(message)s')
             handler = logging.StreamHandler(sys.stdout)
             handler.setFormatter(fmt)
-            logger.addHandler(handler)
-            logger.setLevel(logging.DEBUG)
-        return logger
-
-
-    '''
-    @about
-        临界区开始
-        封装互斥锁
-    @param
-        None
-    @return
-        None
-    '''
-
-    def criticalSectionBegin(self):
-        raise NotImplementedError
-
-    '''
-    @about
-        临界区结束
-    @param
-        None
-    @return
-        None
-    '''
-
-    def criticalSectionEnd(self):
-        raise NotImplementedError
+            self.__vars['logger'].addHandler(handler)
+            self.__vars['logger'].setLevel(logging.DEBUG)
+        return self.__vars['logger']
