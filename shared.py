@@ -16,62 +16,126 @@ def singleton(cls):
 
 @singleton
 class Shared:
+    '''
+    @about
+        构造函数，声明容器
+    @param
+        None
+    @return
+        None
+    '''
     def __init__(self):
         # 全局共享变量集合
-        self.__val = {}
-        # 与变量值对应的线程id
-        self.__id = {}
+        self.__vars = {}
 
     '''
     @about
-        将指定标记位+1
+        将指定标记位+1，无标记时指定为1
+        Python同时只有单个线程执行
+        添加互斥锁仅为逻辑安全需要
     @param
         name:标记名
     @return
         None
     '''
 
-    def setFlag(self, name):
+    def incFlag(self, name):
+        mutex = threading.Lock()
+        mutex.acquire()
         try:
-            self.__val[name] += 1
+            self.__vars[name] += 1
         except:
-            self.__val[name] = 1
+            self.__vars[name] = 1
+        mutex.release()
 
     '''
     @about
-        将指定标记位-1
+        将指定标记位-1，无标记时指定为-1
     @param
         name:标记名
     @return
         None
     '''
 
-    def unsetFlag(self, name):
+    def decFlag(self, name):
         try:
-            self.__val[name] -= 1
+            self.__vars[name] -= 1
         except:
-            self.__val[name] = -1
+            self.__vars[name] = -1
+
 
     '''
     @about
-        锁定变量
+        添加共享变量
+    @param
+        name:
+        value:
+    @return
+        None
+    '''
+    def addVar(self,name,value):
+        self.__vars[name] = value
+
+    '''
+    @about
+        删除共享变量
+    @param
+        name:
+    @return
+        None
+    '''
+    def delVar(self,name):
+        try:
+            del self.__vars[name]
+        except:
+            pass
+
+    
+    '''
+    @about
+        返回全局logging
+    @param
+        None
+    @return
+        全局共享logger
+'''
+
+
+    def getLogger():
+        global logger
+        try:
+            return logger
+        except:
+            logger = logging.getLogger()
+            fmt = logging.Formatter('[%(asctime)s][%(threadName)s][%(levelname)s][%(module)s] %(message)s')
+            handler = logging.StreamHandler(sys.stdout)
+            handler.setFormatter(fmt)
+            logger.addHandler(handler)
+            logger.setLevel(logging.DEBUG)
+        return logger
+
+
+    '''
+    @about
+        临界区开始
+        封装互斥锁
     @param
         None
     @return
         None
     '''
 
-    def lockFlag(self):
-        pass
+    def criticalSectionBegin(self):
+        raise NotImplementedError
 
     '''
     @about
-        解锁变量
+        临界区结束
     @param
         None
     @return
         None
     '''
 
-    def unlockFlag(self):
-        pass
+    def criticalSectionEnd(self):
+        raise NotImplementedError
