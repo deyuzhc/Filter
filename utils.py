@@ -9,104 +9,13 @@ logger模块
 import sys
 import cv2
 import json
-import queue
-import logging
-import threading
 import numpy as np
 import scipy.misc as spm
 
-from hashlib import md5
 from PIL import Image
-
+from hashlib import md5
+from shared import Shared
 from tensorflow.python.framework.ops import Tensor
-
-'''
-@about
-    返回全局logging
-@param
-    None
-@return
-    全局唯一logger
-'''
-
-
-def getLogger():
-    global logger
-    try:
-        return logger
-    except:
-        logger = logging.getLogger()
-        fmt = logging.Formatter('[%(asctime)s][%(threadName)s][%(levelname)s][%(module)s] %(message)s')
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setFormatter(fmt)
-        logger.addHandler(handler)
-        logger.setLevel(logging.DEBUG)
-    return logger
-
-
-'''
-@about
-    用于进程间通信的队列
-@param
-    None
-@return
-    queue
-'''
-
-
-def getQueue(name='default', size=80):
-    global q_dict
-    try:
-        return q_dict[name]
-    except:
-        try:
-            q_dict[name] = queue.Queue(size)
-        except:
-            q_dict = {}
-            q_dict[name] = queue.Queue(size)
-    return q_dict[name]
-
-
-'''
-@about
-    设置全局标记的值
-    使用互斥锁防止冲突
-@param
-    name:标记名
-    value:值
-@return
-    None
-'''
-
-
-def setFlag(name, value):
-    global globalFlags
-    try:
-        type(globalFlags)
-    except:
-        globalFlags = {}
-    mutex = threading.Lock()
-    if mutex.acquire():
-        globalFlags[name] = value
-    mutex.release()
-
-
-'''
-@about
-    获取全局标记的值
-@param
-    name:标记名
-@return
-    标记的值/None
-'''
-
-
-def getFlag(name):
-    try:
-        return globalFlags[name]
-    except:
-        return None
-
 
 '''
 @about
@@ -198,7 +107,8 @@ def readIMG(filename):
 
 
 def readTXT(filename, shape=None):
-    logger = getLogger()
+    shared = Shared()
+    logger = shared.getLogger()
     logger.debug('loading txt:%s...' % filename)
     data = np.loadtxt(filename)
     if shape:
@@ -364,8 +274,9 @@ def md5sum(filename):
 
 
 def saveImage(data, filename):
-    setFlag('safeExit', False)
-    logger = getLogger()
+    sd = Shared()
+    sd.incFlag('safeExit')
+    logger = sd.getLogger()
     src = data.astype(np.uint8)
     if len(src.shape) == 4:
         assert (src.shape[0]) == 1
@@ -377,12 +288,12 @@ def saveImage(data, filename):
         assert (len(src.shape) == 3)
     spm.toimage(src).save(filename)
     logger.debug('image saved to \'%s\'' % filename)
-    setFlag('safeExit', True)
+    sd.decFlag('safeExit')
 
 
 '''
 @about
-    显示图片
+    显示图片，仅windows可用
 @param
     *img:变长参数，所有将要显示的图像
     数组中每个元素均为4维
