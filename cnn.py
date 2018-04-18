@@ -28,6 +28,7 @@ import tensorflow as tf
 
 from proc import Feed
 from proc import Proc
+from shared import Shared
 from termcolor import cprint
 from tensorflow.python.framework.ops import Tensor
 
@@ -44,8 +45,9 @@ class CNN:
     '''
 
     def __init__(self, prop, name, msg_queue=None):
+        sd = Shared()
         # 全局唯一日志句柄
-        self.__logger = utils.getLogger()
+        self.__logger = sd.getLogger()
         # 全局唯一会话
         self.__sess = prop.queryAttr('session')
         # self.__sess = utils.getSession()
@@ -138,10 +140,10 @@ class CNN:
         assert (self.__input1.shape[2] == self.__batch_w and self.__input2.shape[2] == self.__batch_w)
         assert (self.__input1.shape[3] == self.__cols and self.__input2.shape[3] == self.__batch_c)
 
-        w, b = self.getWeights(self.__conv_size, self.__weights_shape)
+        w, b = self.__getWeights(self.__conv_size, self.__weights_shape)
         self.__output = self.__input2
         for i in range(len(b)):
-            self.__output = self.active(self.conv(self.__output, w[i]) + b[i], self.__active_func[i])
+            self.__output = self.__active(self.__conv(self.__output, w[i]) + b[i], self.__active_func[i])
 
     '''
     @about
@@ -196,7 +198,8 @@ class CNN:
     '''
 
     def save(self, path, name, save_round):
-        utils.setFlag('safeExit', False)
+        sd = Shared()
+        sd.incFlag('safeExit')
         self.__logger.info('saving model[%s]...' % self.__name)
         try:
             os.makedirs(path)
@@ -219,7 +222,7 @@ class CNN:
         meta['round'] += save_round
         utils.writeJson(meta, path + 'meta.json')
         self.__logger.info('model[%s] saved.' % self.__name)
-        utils.setFlag('safeExit', True)
+        sd.decFlag('safeExit')
         return True
 
     '''
@@ -285,10 +288,10 @@ class CNN:
         predict = self.process(feed, proc)
 
         truth = None
-        truth = self.getHolder(truth, in1shape)
+        truth = self.__getHolder(truth, in1shape)
 
-        loss = self.loss(predict, truth, self.__loss_func)
-        step = self.optimizer(loss, self.__learning_rate, self.__optimizer)
+        loss = self.__loss(predict, truth, self.__loss_func)
+        step = self.__optimizer(loss, self.__learning_rate, self.__optimizer)
 
         self.init()
 
@@ -331,7 +334,7 @@ class CNN:
         用W对x做卷积之后的结果
     '''
 
-    def conv(self, x, W):
+    def __conv(self, x, W):
         return tf.nn.conv2d(x, W, [1, 1, 1, 1], 'SAME')
 
     '''
@@ -345,7 +348,7 @@ class CNN:
         bs:各层偏置
     '''
 
-    def getWeights(self, k, shape):
+    def __getWeights(self, k, shape):
         ws = []
         bs = []
         for i in range(len(shape) - 1):
@@ -368,7 +371,7 @@ class CNN:
         返回占位符
     '''
 
-    def getHolder(self, obj, shape, name=None):
+    def __getHolder(self, obj, shape, name=None):
         if name:
             obj = tf.placeholder(tf.float32, shape)
         else:
@@ -386,7 +389,7 @@ class CNN:
         激活后的数据
     '''
 
-    def active(self, input, type):
+    def __active(self, input, type):
         lst = ['relu', 'leaky_relu', 'softmax', 'sigmoid', 'tanh']
         assert (type in lst)
         if type == 'relu':
@@ -413,7 +416,7 @@ class CNN:
         损失值
     '''
 
-    def loss(self, input, output, type='l1'):
+    def __loss(self, input, output, type='l1'):
         self.__logger.debug('computing loss...')
         lst = ['l1', 'cross_entropy']
         assert (type in lst)
@@ -440,7 +443,7 @@ class CNN:
         优化器
     '''
 
-    def optimizer(self, loss, learning_rate, type):
+    def __optimizer(self, loss, learning_rate, type):
         self.__logger.debug('building optimizer...')
         if type == 'Adam':
             result = tf.train.AdamOptimizer(learning_rate).minimize(loss)
