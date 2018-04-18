@@ -4,19 +4,15 @@
 用于管理全局共享数据的对象
 '''
 
+import sys
+import queue
 import logging
 import threading
 
-
-# 单例模式装饰器
-def singleton(cls):
-    instance = cls()
-    instance.__call__ = lambda: instance
-    return instance
+from singleton import Singleton
 
 
-@singleton
-class Shared:
+class Shared(metaclass=Singleton):
     '''
     @about
         构造函数，声明容器
@@ -29,8 +25,10 @@ class Shared:
     def __init__(self):
         # 全局共享变量集合
         self.__vars = {}
-        # 当前使用一把锁已足够
+        # 当前使用一把锁足够
         self.__vars['mutex'] = threading.Lock()
+        self.__vars['queue'] = {}
+        self.__vars['flag'] = {}
 
     '''
     @about
@@ -46,9 +44,36 @@ class Shared:
     def incFlag(self, name):
         self.__vars['mutex'].acquire()
         try:
-            self.__vars[name] += 1
+            self.__vars['flag'][name] += 1
         except:
-            self.__vars[name] = 1
+            self.__vars['flag'][name] = 1
+        self.__vars['mutex'].release()
+
+    '''
+    @about
+        获取标记值
+    @param
+        name
+    @return
+        标记值
+    '''
+
+    def getFlag(self, name):
+        return self.__vars['flag'][name]
+
+    '''
+    @about
+        设置标记位
+    @param
+        name:
+        value:
+    @return
+        None
+    '''
+
+    def setFlag(self, name, value):
+        self.__vars['mutex'].acquire()
+        self.__vars['flag'][name] = value
         self.__vars['mutex'].release()
 
     '''
@@ -63,40 +88,10 @@ class Shared:
     def decFlag(self, name):
         self.__vars['mutex'].acquire()
         try:
-            self.__vars[name] -= 1
+            self.__vars['flag'][name] -= 1
         except:
-            self.__vars[name] = -1
+            self.__vars['flag'][name] = -1
         self.__vars['mutex'].release()
-
-    '''
-    @about
-        添加共享变量
-    @param
-        name:
-        value:
-    @return
-        None
-    '''
-
-    def addVar(self, name, value):
-        if name in self.__vars.keys():
-            assert (False)
-        self.__vars[name] = value
-
-    '''
-    @about
-        删除共享变量
-    @param
-        name:
-    @return
-        None
-    '''
-
-    def delVar(self, name):
-        if name in self.__vars.keys():
-            del self.__vars[name]
-        else:
-            raise KeyError
 
     '''
     @about
@@ -118,3 +113,19 @@ class Shared:
             self.__vars['logger'].addHandler(handler)
             self.__vars['logger'].setLevel(logging.DEBUG)
         return self.__vars['logger']
+
+    '''
+    @about
+        用于进程间通信的队列
+    @param
+        None
+    @return
+        queue
+    '''
+
+    def getQueue(self, name='default', size=80):
+        try:
+            return self.__vars['queue'][name]
+        except:
+            self.__vars['queue'][name] = queue.Queue(size)
+        return self.__vars['queue'][name]
