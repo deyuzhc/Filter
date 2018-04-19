@@ -242,19 +242,27 @@ class CNN:
                 saver = tf.train.Saver(save_relative_paths=True)
                 saver.restore(self.__sess, ckpt)
             except:
-                cprint(
-                    'model[%s] mismatch! current checkpoint will be overwriten,do you want to continue?' % self.__name,
-                    'yellow')
-                cands = ['y', 'yes', 'n', 'no']
-                deci = ''
-                while not (deci in cands):
-                    deci = input(cprint('y or n:', 'yellow'))
-                    if deci == 'y' or deci == 'yes':
-                        return False
-                    elif deci == 'n' or deci == 'no':
-                        exit(-1)
-                    else:
-                        self.__logger.warn('invalid input,please try again...')
+                sd = Shared()
+                try:
+                    overwrite = sd.getFlag('overwrite')
+                except:
+                    overwrite = None
+                if overwrite is not True:
+                    cprint(
+                        'model[%s] mismatch! current checkpoint will be overwriten,do you want to continue?' % self.__name,
+                        'yellow')
+                    cands = ['y', 'yes', 'n', 'no']
+                    deci = ''
+                    while not (deci in cands):
+                        deci = input(cprint('y or n:', 'yellow'))
+                        if deci == 'y' or deci == 'yes':
+                            sd.setFlag('overwrite', True)
+                            return False
+                        elif deci == 'n' or deci == 'no':
+                            sd.setFlag('overwrite', False)
+                            exit(-1)
+                        else:
+                            self.__logger.warn('invalid input,please try again...')
                 return False
             self.__logger.info('model restored from the latest checkpoint.')
         else:

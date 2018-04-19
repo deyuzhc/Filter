@@ -51,6 +51,23 @@ class Shared(metaclass=Singleton):
 
     '''
     @about
+        将指定标记位-1，无标记时指定为-1
+    @param
+        name:标记名
+    @return
+        None
+    '''
+
+    def decFlag(self, name):
+        self.__vars['mutex'].acquire()
+        try:
+            self.__vars['flag'][name] -= 1
+        except:
+            self.__vars['flag'][name] = -1
+        self.__vars['mutex'].release()
+
+    '''
+    @about
         获取标记值
     @param
         name
@@ -74,23 +91,6 @@ class Shared(metaclass=Singleton):
     def setFlag(self, name, value):
         self.__vars['mutex'].acquire()
         self.__vars['flag'][name] = value
-        self.__vars['mutex'].release()
-
-    '''
-    @about
-        将指定标记位-1，无标记时指定为-1
-    @param
-        name:标记名
-    @return
-        None
-    '''
-
-    def decFlag(self, name):
-        self.__vars['mutex'].acquire()
-        try:
-            self.__vars['flag'][name] -= 1
-        except:
-            self.__vars['flag'][name] = -1
         self.__vars['mutex'].release()
 
     '''
