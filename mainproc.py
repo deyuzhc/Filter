@@ -198,7 +198,7 @@ class MainProc(Proc):
             self.__globalCNN.init(ckpt_global)
             self.__causticCNN.init(ckpt_caustic)
 
-            self.__save_round = 2
+            self.__save_round = 100
             # restore networks
             for i in range(self.__max_round):
 
