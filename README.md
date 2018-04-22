@@ -5,15 +5,25 @@
 双卷积网络，分焦散光子和全局光子分别处理
 
 依赖项:
+
     [Common]:
+
         1.Python 3
+
         2.TensorFlow
+
         3.OpenCV
+
         4.Scipy
+
         5.Pillow
+
         6.Colorama
+
     [Windows]:
+
         *matplotlib
+
 运行程序:
     [run] main.py
 
