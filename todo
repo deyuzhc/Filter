@@ -12,3 +12,5 @@
 #12.共享变量从utils中剥离
 #13.类内函数声明规范化，使用内部函数声明方式
 14.训练结果发散时，禁止写入checkpoint或删除当前结果
+15.features->sfeatures,plot_high->plot_height,删除conf_input
+16.将nan_fix合入各分支
