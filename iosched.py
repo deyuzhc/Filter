@@ -24,6 +24,7 @@ import utils
 import queue
 import numpy as np
 
+from shared import Shared
 from threading import Thread
 
 
@@ -41,7 +42,8 @@ class IOsched:
     def __init__(self, prop, batchQueue):
         # sample this size from a scene
         self.__sampleNum = 25
-        self.__logger = utils.getLogger()
+        sd = Shared()
+        self.__logger = sd.getLogger()
         # buf size
         self.__maxBufSize = 100
         self.__buf = queue.Queue(self.__maxBufSize)
@@ -81,8 +83,8 @@ class IOsched:
 
     def start(self):
         # 创建两线程
-        producer = Thread(target=self.produce, args=(), name='Producer')
-        consumer = Thread(target=self.consume, args=(), name='Consumer')
+        producer = Thread(target=self.__produce, args=(), name='Producer')
+        consumer = Thread(target=self.__consume, args=(), name='Consumer')
 
         # 守护线程
         producer.setDaemon(True)
@@ -103,7 +105,7 @@ class IOsched:
         None
     '''
 
-    def produce(self):
+    def __produce(self):
         # md5 not match
         self.__abondon = []
         # scenes visited
@@ -119,15 +121,15 @@ class IOsched:
             for i in range(2):
                 imgname = self.__cnn_name[i] + '.png'
                 txtname = self.__cnn_name[i] + '.txt'
-                image[i] = self.getCacheItem(path + imgname)
-                txt[i] = self.getCacheItem(path + txtname)
+                image[i] = self.__getCacheItem(path + imgname)
+                txt[i] = self.__getCacheItem(path + txtname)
                 assert (len(image[i].shape) == 4)
                 assert (len(txt[i].shape) == 4)
             assert (txt[0].shape == txt[1].shape)
             assert (image[0].shape == image[1].shape)
             if self.__mode == 'train':
                 truthname = self.__ground_truth
-                t = self.getCacheItem(path + truthname)
+                t = self.__getCacheItem(path + truthname)
             else:
                 assert (self.__mode == 'infer')
                 xn = image[0].shape[0]
@@ -144,9 +146,9 @@ class IOsched:
 
             for i in range(self.__sampleNum):
                 # how to cut this scene into pieces
-                layer, offset, size = self.getSplitParams(scene)
+                layer, offset, size = self.__getSplitParams(scene)
                 # get a batch from current scene
-                batch = self.splitScene(scene, layer, offset, size)
+                batch = self.__splitScene(scene, layer, offset, size)
                 assert (isinstance(batch, dict))
                 self.__buf.put(batch)
             ptr += 1
@@ -164,7 +166,7 @@ class IOsched:
         None
     '''
 
-    def consume(self):
+    def __consume(self):
         while True:
             msg = self.__buf.get()
             self.__data_queue.put(msg)
@@ -178,7 +180,7 @@ class IOsched:
         处理后的结果
     '''
 
-    def Sigmoid(self, x):
+    def __Sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
 
     '''
@@ -193,7 +195,7 @@ class IOsched:
         value:dict['img_0':img,'txt_0':txt,'img_1':img,'txt_1':txt,'truth':truth]
     '''
 
-    def splitScene(self, scene, layer, offset, size):
+    def __splitScene(self, scene, layer, offset, size):
         # self.__logger.debug('splitting scene...')
         ret = {}
         bn = self.__batch_n
@@ -222,8 +224,8 @@ class IOsched:
         ret[4] = utils.slice(scene[4], [0, sh, sw, 0], [1, bh, bw, cols])  # truth
 
         # preprocess data 
-        ret[1] = self.Sigmoid(ret[1])
-        ret[3] = self.Sigmoid(ret[3])
+        ret[1] = self.__Sigmoid(ret[1])
+        ret[3] = self.__Sigmoid(ret[3])
 
         return ret
 
@@ -236,7 +238,7 @@ class IOsched:
         layer,offset,size:[dy,dx]
     '''
 
-    def getSplitParams(self, scene):
+    def __getSplitParams(self, scene):
         imgkey = len(scene.keys()) - 1  # truth img
         ih = scene[imgkey].shape[1]
         iw = scene[imgkey].shape[2]
@@ -270,7 +272,7 @@ class IOsched:
         value:cache的键值
     '''
 
-    def getCacheItem(self, key):
+    def __getCacheItem(self, key):
         try:
             value = self.__cache.get(key)
         except:

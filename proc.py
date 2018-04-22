@@ -136,4 +136,3 @@ class Feed:
 
     def normalize(self, a):
         raise NotImplementedError
-

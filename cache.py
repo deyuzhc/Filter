@@ -6,17 +6,12 @@
 
 import utils
 
+from shared import Shared
 from termcolor import colored
-
-# 单例模式装饰器
-def singleton(cls):
-    instance = cls()
-    instance.__call__ = lambda: instance
-    return instance
+from singleton import Singleton
 
 
-@singleton
-class Cache:
+class Cache(metaclass=Singleton):
     '''
     @about
         定义Cache大小并初始化
@@ -35,7 +30,8 @@ class Cache:
         self.__MB = 1048576
         self.__in = 0
         self.__sum = 0
-        self.__logger = utils.getLogger()
+        sd = Shared()
+        self.__logger = sd.getLogger()
 
     '''
     @about

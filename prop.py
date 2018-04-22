@@ -5,61 +5,59 @@
 '''
 import utils
 from cache import Cache
-
-# 单例模式装饰器
-def singleton(cls):
-    instance = cls()
-    instance.__call__ = lambda: instance
-    return instance
+from shared import Shared
+from singleton import Singleton
 
 
-@singleton
-class Prop:
+class Prop(metaclass=Singleton):
     def __init__(self):
-        self.__logger = utils.getLogger()
+        sd = Shared()
+        self.__logger = sd.getLogger()
         self.__properties = {}
         self.__properties['CONFIG_FILE'] = 'config.json'
-        self.__properties['mode'] = self.getAttr('mode', 'train', self.__properties['CONFIG_FILE'])
+        self.__properties['mode'] = self.__getAttr('mode', 'train', self.__properties['CONFIG_FILE'])
         if self.__properties['mode'] == 'train':
-            self.__properties['learning_rate'] = self.getAttr('learning_rate', 1e-4, self.__properties['CONFIG_FILE'])
-            self.__properties['max_round'] = self.getAttr('max_round', 8e+3, self.__properties['CONFIG_FILE'])
-            self.__properties['batch_n'] = self.getAttr('batch_n', 1, self.__properties['CONFIG_FILE'])
-            self.__properties['data_dir'] = self.getAttr('train_data', 'data/train/', self.__properties['CONFIG_FILE'])
-            self.__properties['loss_func'] = self.getAttr('loss_func', 'l1', self.__properties['CONFIG_FILE'])
+            self.__properties['learning_rate'] = self.__getAttr('learning_rate', 1e-4, self.__properties['CONFIG_FILE'])
+            self.__properties['max_round'] = self.__getAttr('max_round', 8e+3, self.__properties['CONFIG_FILE'])
+            self.__properties['batch_n'] = self.__getAttr('batch_n', 1, self.__properties['CONFIG_FILE'])
+            self.__properties['data_dir'] = self.__getAttr('train_data', 'data/train/',
+                                                           self.__properties['CONFIG_FILE'])
+            self.__properties['loss_func'] = self.__getAttr('loss_func', 'l1', self.__properties['CONFIG_FILE'])
         else:
             assert (self.__properties['mode'] == 'infer')
-            self.__properties['batch_n'] = self.getAttr('batch_n', 1, self.__properties['CONFIG_FILE'])
+            self.__properties['batch_n'] = self.__getAttr('batch_n', 1, self.__properties['CONFIG_FILE'])
             if self.__properties['batch_n'] != 1:
                 self.__logger.error(
                     'batch_num must be [1] in [predict] mode,change current value [%d] to [1]!' % self.__properties[
                         'batch_n'])
                 self.__properties['batch_n'] = 1
-            self.__properties['data_dir'] = self.getAttr('test_data', 'data/test/', self.__properties['CONFIG_FILE'])
-        self.__properties['conv_size'] = self.getAttr('conv_size', 5, self.__properties['CONFIG_FILE'])
-        self.__properties['graph_name'] = self.getAttr('graph_name', 'model', self.__properties['CONFIG_FILE'])
-        self.__properties['conf_input'] = self.getAttr('conf_input', 'config.json', self.__properties['CONFIG_FILE'])
-        self.__properties['ground_truth'] = self.getAttr('ground_truth', 'truth.png', self.__properties['CONFIG_FILE'])
-        self.__properties['cache_size'] = self.getAttr('cache_size', 800, self.__properties['CONFIG_FILE'])
-        self.__properties['batch_h'] = self.getAttr('batch_h', 50, self.__properties['CONFIG_FILE'])
-        self.__properties['batch_w'] = self.getAttr('batch_w', 50, self.__properties['CONFIG_FILE'])
-        self.__properties['features'] = self.getAttr('features', 8, self.__properties['CONFIG_FILE'])
-        self.__properties['ifeatures'] = self.getAttr('ifeatures', 2, self.__properties['CONFIG_FILE'])
+            self.__properties['data_dir'] = self.__getAttr('test_data', 'data/test/', self.__properties['CONFIG_FILE'])
+        self.__properties['conv_size'] = self.__getAttr('conv_size', 5, self.__properties['CONFIG_FILE'])
+        self.__properties['graph_name'] = self.__getAttr('graph_name', 'model', self.__properties['CONFIG_FILE'])
+        self.__properties['conf_input'] = self.__getAttr('conf_input', 'config.json', self.__properties['CONFIG_FILE'])
+        self.__properties['ground_truth'] = self.__getAttr('ground_truth', 'truth.png',
+                                                           self.__properties['CONFIG_FILE'])
+        self.__properties['cache_size'] = self.__getAttr('cache_size', 800, self.__properties['CONFIG_FILE'])
+        self.__properties['batch_h'] = self.__getAttr('batch_h', 50, self.__properties['CONFIG_FILE'])
+        self.__properties['batch_w'] = self.__getAttr('batch_w', 50, self.__properties['CONFIG_FILE'])
+        self.__properties['features'] = self.__getAttr('features', 8, self.__properties['CONFIG_FILE'])
+        self.__properties['ifeatures'] = self.__getAttr('ifeatures', 2, self.__properties['CONFIG_FILE'])
         assert (self.__properties['ifeatures'] == 2)
-        self.__properties['optimizer'] = self.getAttr('optimizer', 'Adam', self.__properties['CONFIG_FILE'])
-        self.__properties['model_path'] = self.getAttr('model_path', 'data/model/', self.__properties['CONFIG_FILE'])
-        self.__properties['ckpt_name'] = self.getAttr('ckpt_name', 'model', self.__properties['CONFIG_FILE'])
-        self.__properties['cnn_name'] = self.getAttr('cnn_name', ['global', 'caustic'],
-                                                     self.__properties['CONFIG_FILE'])
-        self.__properties['active_func'] = self.getAttr('active_func', ['relu', 'sigmoid', 'relu', 'sigmoid'],
-                                                        self.__properties['CONFIG_FILE'])
-        self.__properties['weights_shape'] = self.getAttr('weights_shape', [8, 100, 100, 100, 121],
+        self.__properties['optimizer'] = self.__getAttr('optimizer', 'Adam', self.__properties['CONFIG_FILE'])
+        self.__properties['model_path'] = self.__getAttr('model_path', 'data/model/', self.__properties['CONFIG_FILE'])
+        self.__properties['ckpt_name'] = self.__getAttr('ckpt_name', 'model', self.__properties['CONFIG_FILE'])
+        self.__properties['cnn_name'] = self.__getAttr('cnn_name', ['global', 'caustic'],
+                                                       self.__properties['CONFIG_FILE'])
+        self.__properties['active_func'] = self.__getAttr('active_func', ['relu', 'sigmoid', 'relu', 'sigmoid'],
                                                           self.__properties['CONFIG_FILE'])
+        self.__properties['weights_shape'] = self.__getAttr('weights_shape', [8, 100, 100, 100, 121],
+                                                            self.__properties['CONFIG_FILE'])
         assert (len(self.__properties['active_func']) + 1 == len(self.__properties['weights_shape']))
         # channels of image
-        self.__properties['cols'] = self.getAttr('cols', 3, self.__properties['CONFIG_FILE'])
+        self.__properties['cols'] = self.__getAttr('cols', 3, self.__properties['CONFIG_FILE'])
         # message queue
-        self.__properties['plot_high'] = self.getAttr('plot_high', 300, self.__properties['CONFIG_FILE'])
-        self.__properties['plot_width'] = self.getAttr('plot_width', 100, self.__properties['CONFIG_FILE'])
+        self.__properties['plot_high'] = self.__getAttr('plot_high', 300, self.__properties['CONFIG_FILE'])
+        self.__properties['plot_width'] = self.__getAttr('plot_width', 100, self.__properties['CONFIG_FILE'])
         self.__properties['session'] = None  # utils.getSession()
         self.__properties['cache'] = Cache(self.queryAttr('cache_size'))
 
@@ -90,7 +88,7 @@ class Prop:
 
     def updateAttr(self, name, value):
         # assert(False)
-        self.setAttr(name, value)
+        self.__setAttr(name, value)
 
     '''
     @about
@@ -141,7 +139,7 @@ class Prop:
         default:缺省值
     '''
 
-    def getAttr(self, name, default, filename):
+    def __getAttr(self, name, default, filename):
         result = utils.getJsonAttr(name, default, filename)
         return result
 
@@ -153,5 +151,5 @@ class Prop:
         value:缺省值
     '''
 
-    def setAttr(self, name, value):
+    def __setAttr(self, name, value):
         self.__properties[name] = value

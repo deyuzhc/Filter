@@ -4,16 +4,17 @@
 程度的主要流程，合并两条滤波线路并
 '''
 
-from proc import Proc
-from proc import Feed
-from filter import Filter
-from filter import FilterFeed
-from threading import Thread
-from cnn import CNN
-
 import utils
 import platform
 import tensorflow as tf
+
+from proc import Proc
+from proc import Feed
+from filter import Filter
+from shared import Shared
+from filter import FilterFeed
+from threading import Thread
+from cnn import CNN
 
 '''
 负责整个程序流程
@@ -33,7 +34,8 @@ class MainProc(Proc):
     '''
 
     def __init__(self, prop, feed, msg_queue=None):
-        self.__logger = utils.getLogger()
+        sd = Shared()
+        self.__logger = sd.getLogger()
         self.__prop = prop
         self.__feed = feed
         self.__msg_queue = msg_queue
@@ -254,6 +256,7 @@ class MainProc(Proc):
     '''
 
     def postprocess(self, input1):
+        sd = Shared()
         self.__logger.debug('postprocessing...')
         if not self.__isTrain:
             # path of test data file
@@ -261,7 +264,7 @@ class MainProc(Proc):
             utils.saveImage(input1, save_path + 'infer.png')
             # utils.displayImage(input)
 
-        utils.setFlag('nowExit', True)
+        sd.setFlag('nowExit', True)
 
 
 '''
@@ -289,7 +292,8 @@ class MainFeed(Feed):
         self.__ifeatures = prop.queryAttr('ifeatures')
         self.__batch_c = self.__features + self.__ifeatures
 
-        self.__logger = utils.getLogger()
+        sd = Shared()
+        self.__logger = sd.getLogger()
         # two networks
         cnns = prop.queryAttr('cnn_name')
 
@@ -336,7 +340,7 @@ class MainFeed(Feed):
          md5
     '''
 
-    def test_md5(self, string):
+    def __test_md5(self, string):
         import hashlib
         vmd5 = hashlib.md5()
         vmd5.update(string.encode('utf8'))

@@ -12,6 +12,7 @@ import tensorflow as tf
 
 from proc import Proc
 from proc import Feed
+from shared import Shared
 from tensorflow.python.framework.ops import Tensor
 
 
@@ -26,7 +27,8 @@ class Filter(Proc):
     '''
 
     def __init__(self, prop):
-        self.__logger = utils.getLogger()
+        sd = Shared()
+        self.__logger = sd.getLogger()
         self.__isTrain = prop.needTrain()
         # 图像切片维度
         self.__batch_h = prop.queryAttr('batch_h')
@@ -331,7 +333,8 @@ class FilterFeed(Feed):
     '''
 
     def __init__(self, prop):
-        self.__logger = utils.getLogger()
+        sd = Shared()
+        self.__logger = sd.getLogger()
         self.__isTrain = True if prop.needTrain() else False
         self.__input_dir = prop.queryAttr('data_dir')
         self.__scene_name = os.listdir(self.__input_dir)
@@ -377,7 +380,7 @@ class FilterFeed(Feed):
     '''
 
     def getInputdata(self):
-        assert (not self.isTrainMode())
+        assert (not self.__isTrain)
         features = self.__features
         ifeatures = self.__ifeatures
         # check md5
@@ -503,7 +506,6 @@ class FilterFeed(Feed):
         result = np.tanh(input)
         return result
 
-
     '''
     @about
         内部函数
@@ -520,7 +522,7 @@ class FilterFeed(Feed):
 
     def next_batch(self, seed):
         np.random.seed(seed)
-        assert (self.isTrainMode())
+        assert (self.__isTrain)
         self.__logger.debug('Size of Cache:%dM' % self.__cache.getSize())
         self.__logger.debug('Eta of Cache:%.2f%%' % (self.__cache.getEta() * 100.0))
         cols = self.__cols

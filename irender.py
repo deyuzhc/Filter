@@ -10,6 +10,7 @@ import utils
 from proc import Proc
 from proc import Feed
 
+from shared import Shared
 from matplotlib import pyplot as plt
 
 
@@ -34,8 +35,9 @@ class iRender(Proc):
         plt.ion()
         plt.title('run chart')
 
+        sd = Shared()
         self.__feed = iRenderFeed(queue)
-        self.__logger = utils.getLogger()
+        self.__logger = sd.getLogger()
 
         self.__xs = [0, 0]
         self.__ys = [self.__high, self.__high]
@@ -70,5 +72,3 @@ class iRenderFeed(Feed):
     def next_batch(self):
         msg = self.__queue.get()
         return msg[0], msg[1]
-
-

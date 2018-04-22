@@ -6,11 +6,11 @@
 '''
 
 from prop import Prop
+from shared import Shared
 from iosched import IOsched
 from mainproc import MainProc
 from mainproc import MainFeed
 
-import utils
 import signal
 import platform
 import tensorflow as tf
@@ -21,21 +21,23 @@ if platform.system() == 'Windows':
 
 
 def handler(sig, frame):
-    logger = utils.getLogger()
-    logger.info('closing...patient...')
+    sd = Shared()
+    logger = sd.getLogger()
+    logger.info('...closing...patient...')
 
-    while not utils.getFlag('safeExit'):
+    while sd.getFlag('safeExit') != 0:
         pass
-    utils.setFlag('nowExit', True)
+    sd.setFlag('nowExit', True)
 
 
 def main(argv=None):
+    sd = Shared()
     # 全局唯一日志句柄
-    logger = utils.getLogger()
-    # 是否可打断当前的操作
-    utils.setFlag('safeExit', True)
-    # 是否退出当前程序
-    utils.setFlag('nowExit', False)
+    logger = sd.getLogger()
+    # 当前操作是否可打断
+    sd.setFlag('safeExit', 0)
+    # 当前是否可退出
+    sd.setFlag('nowExit', False)
 
     # 处理SIGINT信号
     signal.signal(signal.SIGINT, handler)
@@ -45,9 +47,9 @@ def main(argv=None):
     logger.info(prop.toString())
 
     # 消息队列，用于中转训练误差信息
-    msg_queue = utils.getQueue('msg')
+    msg_queue = sd.getQueue('msg')
     # 数据队列，用于中转训练数据
-    data_queue = utils.getQueue('data')
+    data_queue = sd.getQueue('data')
 
     # 文件调度对象，加载数据数据
     sched = IOsched(prop, data_queue)
@@ -59,7 +61,7 @@ def main(argv=None):
     mainproc.start()
 
     # 主线程等待终止消息或信号
-    while not utils.getFlag('nowExit'):
+    while not sd.getFlag('nowExit'):
         pass
 
 
