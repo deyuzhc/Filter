@@ -26,7 +26,6 @@
     config.json
 
     ·卷积网络结构
-
         [conv_size]
         [sfeatures]
         [ifeatures]
@@ -42,16 +41,20 @@
         [loss_func]
         [max_round]
         [learning_rate]
+
     ·程序输入数据
         [test_data]
         [train_data]
         [ground_truth]
+
     ·训练结果存储
         [model_path]
         [ckpt_name]
+
     ·训练效果显示
         [plot_width]
         [plot_height]
+
     ·其它参数
         [cache_size]
 
