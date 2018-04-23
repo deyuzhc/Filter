@@ -7,34 +7,32 @@
 依赖项:
 
     [Common]:
-
         1.Python 3
-
         2.TensorFlow
-
         3.OpenCV
-
         4.Scipy
-
         5.Pillow
-
         6.Colorama
 
     [Windows]:
-
         *matplotlib
 
 运行程序:
+
     [run] main.py
 
 参数配置:
+
     config.json
+
     ·卷积网络结构
+
         [conv_size]
         [sfeatures]
         [ifeatures]
         [weights_shape]
         [active_func]
+
     ·程序运行参数
         [mode]
         [batch_n]
