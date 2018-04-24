@@ -59,3 +59,30 @@
         [cache_size]
 
 模块说明:
+
+	·main.py
+		程序入口，创建各类对象
+	·mainproc.py
+		程序主逻辑，指定任务流程
+	·iosched.py
+		场景文件的加载与切分
+	·cache.py
+	    缓存场景数据
+	·cnn.py
+		构建卷积神经网络
+	·filter.py
+		进行图像滤波
+	·irender.py
+		Windows上绘制折线图
+	·proc.py
+		抽象任务处理类
+	·prop.py
+		存储程序所有参数
+	·shared.py
+		存储全局共享变量
+	·singleton.py
+		单例模式类
+	·test.py
+		测试程序流程
+	·utils.py
+		提供文件读写，图像显示等通用功能
