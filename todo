@@ -13,3 +13,5 @@
 13.将nan_fix合入各分支
 14.meta中存储每次训练的误差，可用来显示训练趋势
 15.meta中训练次数记录有误，待修正
+16.features->sfeatures,plot_high->plot_height,删除conf_input
+17.训练结果发散时，禁止写入checkpoint或删除当前结果
