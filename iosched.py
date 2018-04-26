@@ -122,9 +122,11 @@ class IOsched:
                 imgname = self.__cnn_name[i] + '.png'
                 txtname = self.__cnn_name[i] + '.txt'
                 image[i] = self.__getCacheItem(path + imgname)
-                txt[i] = self.__getCacheItem(path + txtname)
                 assert (len(image[i].shape) == 4)
-                assert (len(txt[i].shape) == 4)
+                self.__ih = image[i].shape[1]
+                self.__iw = image[i].shape[2]
+                txt[i] = self.__getCacheItem(path + txtname)
+                txt[i] = np.reshape(txt[i],[-1, self.__ih, self.__iw, self.__sfeatures])
             assert (txt[0].shape == txt[1].shape)
             assert (image[0].shape == image[1].shape)
             if self.__mode == 'train':
@@ -206,8 +208,6 @@ class IOsched:
         ifeatures = self.__ifeatures
         ret[1] = ret[3] = np.zeros([1, bh, bw, bc])
         # make sure ih and iw's value
-        assert (self.__ih == scene[0].shape[1])
-        assert (self.__iw == scene[0].shape[2])
         scene[1] = np.reshape(scene[1], [-1, self.__ih, self.__iw, sfeatures])
         scene[3] = np.reshape(scene[3], [-1, self.__ih, self.__iw, sfeatures])
         sh = offset[0]
@@ -278,13 +278,8 @@ class IOsched:
         except:
             if key[-4:] == '.txt':
                 value = utils.readTXT(key)
-                if self.__ih != 0 and self.__iw != 0:
-                    value = np.reshape(value, [-1, self.__ih, self.__iw, self.__sfeatures])
             else:
                 assert (key[-4:] == '.png')
                 value = utils.readIMG(key)
-                if self.__ih == 0 or self.__iw == 0:
-                    self.__ih = value.shape[1]
-                    self.__iw = value.shape[2]
             self.__cache.add(key, value)
         return value
