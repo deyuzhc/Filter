@@ -63,7 +63,7 @@ class MainProc(Proc):
         self.__batch_n = self.__prop.queryAttr('batch_n')
         self.__batch_h = self.__prop.queryAttr('batch_h')
         self.__batch_w = self.__prop.queryAttr('batch_w')
-        self.__batch_c = self.__prop.queryAttr('features') + self.__prop.queryAttr('ifeatures')
+        self.__batch_c = self.__prop.queryAttr('sfeatures') + self.__prop.queryAttr('ifeatures')
         self.__cols = self.__prop.queryAttr('cols')
 
         # global photon cnn
@@ -288,9 +288,9 @@ class MainFeed(Feed):
         self.__batch_n = prop.queryAttr('batch_n')
         self.__batch_h = prop.queryAttr('batch_h')
         self.__batch_w = prop.queryAttr('batch_w')
-        self.__features = prop.queryAttr('features')
+        self.__sfeatures = prop.queryAttr('sfeatures')
         self.__ifeatures = prop.queryAttr('ifeatures')
-        self.__batch_c = self.__features + self.__ifeatures
+        self.__batch_c = self.__sfeatures + self.__ifeatures
 
         sd = Shared()
         self.__logger = sd.getLogger()

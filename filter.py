@@ -35,9 +35,9 @@ class Filter(Proc):
         self.__batch_w = prop.queryAttr('batch_w')
         self.__batch_n = prop.queryAttr('batch_n')
         # 空间域和图像域特征
-        self.__features = prop.queryAttr('features')
+        self.__sfeatures = prop.queryAttr('sfeatures')
         self.__ifeatures = prop.queryAttr('ifeatures')
-        self.__batch_c = self.__features + self.__ifeatures
+        self.__batch_c = self.__sfeatures + self.__ifeatures
         self.__shape1 = [self.__batch_n, self.__batch_h, self.__batch_w, 3]
         self.__shape2 = [self.__batch_n, self.__batch_h, self.__batch_w, self.__batch_c]
 
@@ -345,9 +345,9 @@ class FilterFeed(Feed):
         self.__batch_h = prop.queryAttr('batch_h')
         self.__batch_w = prop.queryAttr('batch_w')
         self.__batch_n = prop.queryAttr('batch_n')
-        self.__features = prop.queryAttr('features')
+        self.__sfeatures = prop.queryAttr('sfeatures')
         self.__ifeatures = prop.queryAttr('ifeatures')
-        self.__batch_c = self.__features + self.__ifeatures
+        self.__batch_c = self.__sfeatures + self.__ifeatures
         self.__cache_size = prop.queryAttr('cache_size')
         self.__cache = prop.queryAttr('cache')
         self.__abandons = []
@@ -381,7 +381,7 @@ class FilterFeed(Feed):
 
     def getInputdata(self):
         assert (not self.__isTrain)
-        features = self.__features
+        sfeatures = self.__sfeatures
         ifeatures = self.__ifeatures
         # check md5
         imgpath = self.__input_dir + self.__img_input
@@ -416,7 +416,7 @@ class FilterFeed(Feed):
             # height & width of the input image
             ih = value['input'].shape[1]
             iw = value['input'].shape[2]
-            value['data'] = np.reshape(value['data'], [-1, ih, iw, features])
+            value['data'] = np.reshape(value['data'], [-1, ih, iw, sfeatures])
             # x1 Image,[n,h,w,3]
 
             # sx = sy = 500
@@ -442,8 +442,8 @@ class FilterFeed(Feed):
             x2 = x2[idx:idx + 1, :, :, :]
             # add features subtracted from input image
             assert (ifeatures == 2)
-            x2[:, :, :, features + 0:features + 1] = utils.getLuminance(x1)
-            x2[:, :, :, features + 1:features + 2] = utils.getMagnitude(x1)
+            x2[:, :, :, sfeatures + 0:sfeatures + 1] = utils.getLuminance(x1)
+            x2[:, :, :, sfeatures + 1:sfeatures + 2] = utils.getMagnitude(x1)
             # x2[:,:,:,features + 2:features + 5] = np.reshape(x1,[bh,bw,cols])
             # normalize x2
             x2 = self.normalize(x2)
@@ -530,7 +530,7 @@ class FilterFeed(Feed):
         bh = self.__batch_h
         bw = self.__batch_w
         bc = self.__batch_c
-        features = self.__features
+        sfeatures = self.__sfeatures
         # x1 input image,x2 txt features,y ground truth
         x1 = np.zeros([bn, bh, bw, cols])
         x2 = np.zeros([bn, bh, bw, bc])
@@ -582,7 +582,7 @@ class FilterFeed(Feed):
             # height & width of the input image
             ih = value['input'].shape[1]
             iw = value['input'].shape[2]
-            value['data'] = np.reshape(value['data'], [-1, ih, iw, features])
+            value['data'] = np.reshape(value['data'], [-1, ih, iw, sfeatures])
             # pick a sample pos(left&up corner) randomly
             sh = np.random.randint(0, ih - bh)
             sw = np.random.randint(0, iw - bw)
@@ -599,11 +599,11 @@ class FilterFeed(Feed):
             # part of input txt(px2)
             px2 = np.zeros([1, bh, bw, bc])
             # [ 0:features]:features stored in txt
-            px2[:, :, :, :features] = utils.slice(value['data'], [idx, sh, sw, 0], [1, bh, bw, features])
+            px2[:, :, :, :sfeatures] = utils.slice(value['data'], [idx, sh, sw, 0], [1, bh, bw, sfeatures])
             # [features:]:features extracted from img
             assert (self.__ifeatures == 2)
-            px2[:, :, :, features + 0:features + 1] = utils.getLuminance(px1)
-            px2[:, :, :, features + 1:features + 2] = utils.getMagnitude(px1)
+            px2[:, :, :, sfeatures + 0:sfeatures + 1] = utils.getLuminance(px1)
+            px2[:, :, :, sfeatures + 1:sfeatures + 2] = utils.getMagnitude(px1)
             # px2[:,:,:,features + 2:features + 5] =
             # np.reshape(px1,[bh,bw,cols])
             px2 = np.reshape(px2, [-1, bc])

@@ -56,9 +56,9 @@ class IOsched:
         self.__batch_n = prop.queryAttr('batch_n')
         self.__batch_h = prop.queryAttr('batch_h')
         self.__batch_w = prop.queryAttr('batch_w')
-        self.__features = prop.queryAttr('features')
+        self.__sfeatures = prop.queryAttr('sfeatures')
         self.__ifeatures = prop.queryAttr('ifeatures')
-        self.__batch_c = self.__features + self.__ifeatures
+        self.__batch_c = self.__sfeatures + self.__ifeatures
         self.__ground_truth = prop.queryAttr('ground_truth')
         # cache
         self.__cache = prop.queryAttr('cache')
@@ -122,9 +122,11 @@ class IOsched:
                 imgname = self.__cnn_name[i] + '.png'
                 txtname = self.__cnn_name[i] + '.txt'
                 image[i] = self.__getCacheItem(path + imgname)
-                txt[i] = self.__getCacheItem(path + txtname)
                 assert (len(image[i].shape) == 4)
-                assert (len(txt[i].shape) == 4)
+                self.__ih = image[i].shape[1]
+                self.__iw = image[i].shape[2]
+                txt[i] = self.__getCacheItem(path + txtname)
+                txt[i] = np.reshape(txt[i],[-1, self.__ih, self.__iw, self.__sfeatures])
             assert (txt[0].shape == txt[1].shape)
             assert (image[0].shape == image[1].shape)
             if self.__mode == 'train':
@@ -202,25 +204,23 @@ class IOsched:
         bh = self.__batch_h
         bw = self.__batch_w
         bc = self.__batch_c
-        features = self.__features
-        ifeatures = self.__features
+        sfeatures = self.__sfeatures
+        ifeatures = self.__ifeatures
         ret[1] = ret[3] = np.zeros([1, bh, bw, bc])
         # make sure ih and iw's value
-        assert (self.__ih == scene[0].shape[1])
-        assert (self.__iw == scene[0].shape[2])
-        scene[1] = np.reshape(scene[1], [-1, self.__ih, self.__iw, self.__features])
-        scene[3] = np.reshape(scene[3], [-1, self.__ih, self.__iw, self.__features])
+        scene[1] = np.reshape(scene[1], [-1, self.__ih, self.__iw, sfeatures])
+        scene[3] = np.reshape(scene[3], [-1, self.__ih, self.__iw, sfeatures])
         sh = offset[0]
         sw = offset[1]
         cols = 3
         ret[0] = utils.slice(scene[0], [0, sh, sw, 0], [1, bh, bw, cols])  # img-0
-        ret[1][:, :, :, :features] = utils.slice(scene[1], [layer, sh, sw, 0], [1, bh, bw, self.__features])  # txt-0
-        ret[1][:, :, :, features + 0:features + 1] = utils.getLuminance(ret[0])
-        ret[1][:, :, :, features + 1:features + 2] = utils.getMagnitude(ret[0])
+        ret[1][:, :, :, :sfeatures] = utils.slice(scene[1], [layer, sh, sw, 0], [1, bh, bw, sfeatures])  # txt-0
+        ret[1][:, :, :, sfeatures + 0:sfeatures + 1] = utils.getLuminance(ret[0])
+        ret[1][:, :, :, sfeatures + 1:sfeatures + 2] = utils.getMagnitude(ret[0])
         ret[2] = utils.slice(scene[2], [0, sh, sw, 0], [1, bh, bw, cols])  # img-1
-        ret[3][:, :, :, :features] = utils.slice(scene[3], [layer, sh, sw, 0], [1, bh, bw, self.__features])  # txt-1
-        ret[3][:, :, :, features + 0:features + 1] = utils.getLuminance(ret[2])
-        ret[3][:, :, :, features + 1:features + 2] = utils.getMagnitude(ret[2])
+        ret[3][:, :, :, :sfeatures] = utils.slice(scene[3], [layer, sh, sw, 0], [1, bh, bw, sfeatures])  # txt-1
+        ret[3][:, :, :, sfeatures + 0:sfeatures + 1] = utils.getLuminance(ret[2])
+        ret[3][:, :, :, sfeatures + 1:sfeatures + 2] = utils.getMagnitude(ret[2])
         ret[4] = utils.slice(scene[4], [0, sh, sw, 0], [1, bh, bw, cols])  # truth
 
         # preprocess data 
@@ -278,13 +278,8 @@ class IOsched:
         except:
             if key[-4:] == '.txt':
                 value = utils.readTXT(key)
-                if self.__ih != 0 and self.__iw != 0:
-                    value = np.reshape(value, [-1, self.__ih, self.__iw, self.__features])
             else:
                 assert (key[-4:] == '.png')
                 value = utils.readIMG(key)
-                if self.__ih == 0 or self.__iw == 0:
-                    self.__ih = value.shape[1]
-                    self.__iw = value.shape[2]
             self.__cache.add(key, value)
         return value
