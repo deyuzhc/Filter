@@ -40,7 +40,7 @@ class Prop(metaclass=Singleton):
         self.__properties['cache_size'] = self.__getAttr('cache_size', 800, self.__properties['CONFIG_FILE'])
         self.__properties['batch_h'] = self.__getAttr('batch_h', 50, self.__properties['CONFIG_FILE'])
         self.__properties['batch_w'] = self.__getAttr('batch_w', 50, self.__properties['CONFIG_FILE'])
-        self.__properties['features'] = self.__getAttr('features', 8, self.__properties['CONFIG_FILE'])
+        self.__properties['sfeatures'] = self.__getAttr('sfeatures', 8, self.__properties['CONFIG_FILE'])
         self.__properties['ifeatures'] = self.__getAttr('ifeatures', 2, self.__properties['CONFIG_FILE'])
         assert (self.__properties['ifeatures'] == 2)
         self.__properties['optimizer'] = self.__getAttr('optimizer', 'Adam', self.__properties['CONFIG_FILE'])
@@ -121,7 +121,7 @@ class Prop(metaclass=Singleton):
         result += '# [batch_height]:\t[' + str(self.__properties['batch_h']) + ']\n'
         result += '# [batch_width]:\t[' + str(self.__properties['batch_w']) + ']\n'
         result += '# [conv_size]:\t\t[' + str(self.__properties['conv_size']) + ']\n'
-        result += '# [features]:\t\t[' + str(self.__properties['features']) + ']\n'
+        result += '# [sfeatures]:\t\t[' + str(self.__properties['sfeatures']) + ']\n'
         result += '# [ifeatures]:\t\t[' + str(self.__properties['ifeatures']) + ']\n'
         result += '# [weights_shape]:\t' + str(self.__properties['weights_shape']) + '\n'
         result += '# [active_func]:\t' + str(self.__properties['active_func']) + '\n'
