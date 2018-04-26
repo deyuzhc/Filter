@@ -56,11 +56,11 @@ class CNN:
         # 消息队列，用于中转训练误差数据
         self.__queue = msg_queue
         # 空间域特征
-        features = prop.queryAttr('features')
+        sfeatures = prop.queryAttr('sfeatures')
         # 图像域特征
         ifeatures = prop.queryAttr('ifeatures')
         # 输入切片的维度
-        self.__batch_c = features + ifeatures
+        self.__batch_c = sfeatures + ifeatures
         self.__batch_h = prop.queryAttr('batch_h')
         self.__batch_w = prop.queryAttr('batch_w')
         # 图像通道，一般为3
