@@ -208,8 +208,8 @@ class IOsched:
         # make sure ih and iw's value
         assert (self.__ih == scene[0].shape[1])
         assert (self.__iw == scene[0].shape[2])
-        scene[1] = np.reshape(scene[1], [-1, self.__ih, self.__iw, self.__sfeatures])
-        scene[3] = np.reshape(scene[3], [-1, self.__ih, self.__iw, self.__sfeatures])
+        scene[1] = np.reshape(scene[1], [-1, self.__ih, self.__iw, sfeatures])
+        scene[3] = np.reshape(scene[3], [-1, self.__ih, self.__iw, sfeatures])
         sh = offset[0]
         sw = offset[1]
         cols = 3
@@ -279,7 +279,7 @@ class IOsched:
             if key[-4:] == '.txt':
                 value = utils.readTXT(key)
                 if self.__ih != 0 and self.__iw != 0:
-                    value = np.reshape(value, [-1, self.__ih, self.__iw, features])
+                    value = np.reshape(value, [-1, self.__ih, self.__iw, self.__sfeatures])
             else:
                 assert (key[-4:] == '.png')
                 value = utils.readIMG(key)
