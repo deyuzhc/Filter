@@ -99,8 +99,7 @@ class Prop(metaclass=Singleton):
 
     def toString(self):
         result = '\n\n\t\t[Properties]:\n'
-        result += '# [config file]:\t[\'' + self.__properties['CONFIG_FILE'] + '\']\n'
-        result += '# [running_mode]:\t[\'' + self.__properties['mode'] + '\']\n'
+        result += '# [mode]:\t\t[\'' + self.__properties['mode'] + '\']\n'
         if self.__properties['mode'] == 'train':
             result += '# [max_round]:\t\t[' + str(self.__properties['max_round']) + ']\n'
             result += '# [learning_rate]:\t[' + str(self.__properties['learning_rate']) + ']\n'

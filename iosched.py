@@ -46,7 +46,7 @@ class IOsched:
         self.__logger = sd.getLogger()
         # buf size
         self.__maxBufSize = 300
-        self.__buf = queue.Queue(self.__maxBufSize)
+        self.__buf = []
         # send batchs to this queue
         self.__data_queue = batchQueue
         self.__mode = prop.queryAttr('mode')
@@ -147,12 +147,14 @@ class IOsched:
             del image
 
             for i in range(self.__sampleNum):
-                # how to cut this scene into pieces
+                # 对场景进行切片时的参数
                 layer, offset, size = self.__getSplitParams(scene)
-                # get a batch from current scene
+                # 获取一个场景切片
                 batch = self.__splitScene(scene, layer, offset, size)
                 assert (isinstance(batch, dict))
-                self.__buf.put(batch)
+                while len(self.__buf) >= self.__maxBufSize:
+                    pass
+                self.__buf.append(batch)
             ptr += 1
             if (ptr == len(self.__directories)):
                 ptr = 0
@@ -170,7 +172,11 @@ class IOsched:
 
     def __consume(self):
         while True:
-            msg = self.__buf.get()
+            if len(self.__buf) == 0:
+                continue
+            idx = np.random.randint(0,len(self.__buf))
+            msg = self.__buf[idx]
+            self.__buf.pop(idx)
             self.__data_queue.put(msg)
 
     '''
