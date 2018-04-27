@@ -230,8 +230,8 @@ class IOsched:
         ret[4] = utils.slice(scene[4], [0, sh, sw, 0], [1, bh, bw, cols])  # truth
 
         # preprocess data 
-        # ret[1] = self.__Sigmoid(ret[1])
-        # ret[3] = self.__Sigmoid(ret[3])
+        ret[1] = self.__Sigmoid(ret[1])
+        ret[3] = self.__Sigmoid(ret[3])
 
         return ret
 
