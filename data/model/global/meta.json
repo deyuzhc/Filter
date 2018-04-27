@@ -1,1 +1,1 @@
-{"weights": "tmp", "name": "model", "active_func": "tmp", "round": 200}
+{"round": 200, "weights": "tmp", "active_func": "tmp", "name": "model"}

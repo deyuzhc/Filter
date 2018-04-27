@@ -45,7 +45,7 @@ class IOsched:
         sd = Shared()
         self.__logger = sd.getLogger()
         # buf size
-        self.__maxBufSize = 100
+        self.__maxBufSize = 300
         self.__buf = queue.Queue(self.__maxBufSize)
         # send batchs to this queue
         self.__data_queue = batchQueue
@@ -224,8 +224,8 @@ class IOsched:
         ret[4] = utils.slice(scene[4], [0, sh, sw, 0], [1, bh, bw, cols])  # truth
 
         # preprocess data 
-        ret[1] = self.__Sigmoid(ret[1])
-        ret[3] = self.__Sigmoid(ret[3])
+        # ret[1] = self.__Sigmoid(ret[1])
+        # ret[3] = self.__Sigmoid(ret[3])
 
         return ret
 
