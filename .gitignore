@@ -1,8 +1,9 @@
-# pyc
+# .pyc
 __pycache__
+
+# IDE
+.idea
 
 # ... 
 run
-
-# ide
-.idea
+run.log

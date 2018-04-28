@@ -13,6 +13,7 @@
         4.Scipy
         5.Pillow
         6.Colorama
+        7.eprogress
 
     [Windows]:
         *matplotlib

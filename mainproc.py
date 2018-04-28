@@ -12,6 +12,7 @@ from proc import Proc
 from proc import Feed
 from filter import Filter
 from shared import Shared
+from eprogress import LineProgress
 from filter import FilterFeed
 from threading import Thread
 from cnn import CNN
@@ -193,13 +194,17 @@ class MainProc(Proc):
             loss = tf.reduce_mean(tf.abs(tf.subtract(predict, truth)))
             step = tf.train.AdamOptimizer(self.__learning_rate).minimize(loss)
 
-            # init these two network randomly
+            print('initializing...')
+            # 随机初始化两网络
             # self.__sess.run(tf.global_variables_initializer())
             self.__globalCNN.init(ckpt_global)
             self.__causticCNN.init(ckpt_caustic)
 
-            self.__save_round = 100
-            # restore networks
+            # 用于绘制进度条
+            bar = LineProgress(title='status', total=self.__max_round)
+
+            self.__save_round = 500
+            # 训练
             for i in range(self.__max_round):
 
                 gi, gf, ci, cf, gt = feed.next_batch()
@@ -210,28 +215,24 @@ class MainProc(Proc):
                                                          self.__caustic_fea: cf, self.__global_fea: gf,
                                                          truth: gt})
 
-                self.sendMsg([i / max(0, self.__max_round), xloss])
+                self.sendMsg([i / self.__max_round, xloss])
 
                 # xpred = self.__sess.run(predict,feed_dict={self.__caustic_img:ci,self.__global_img:gi,
                 #                                        self.__caustic_fea:cf,self.__global_fea:gf,
                 #                                        truth:gt})
 
-                # print(xpred.shape)
-                # xpred = np.reshape(xpred,[100,100,3])
-                # utils.saveImage(xpred,'tmp/predict-'+ str(i) +'.png')
+                self.__logger.info('round:%d of %d,loss:%f...' % (i + 1, self.__max_round, xloss))
+                # print("status: {:.2f}%".format(float((i + 1) / self.__max_round)), end="\r")
 
-                if self.__max_round > 0:
-                    self.__logger.info('round:%d of %d,loss:%f...' % (i + 1, self.__max_round, xloss))
-                else:
-                    self.__logger.info('round:%d of inf,loss:%f...' % (i + 1, xloss))
+                bar.update((i + 1) / self.__max_round)
 
-                # save result
+                # 保存结果
                 if i % self.__save_round == (self.__save_round - 1):
                     self.__globalCNN.save(ckpt_global, self.__ckpt_name, self.__save_round)
                     self.__causticCNN.save(ckpt_caustic, self.__ckpt_name, self.__save_round)
 
 
-        # output directly when in infer mode
+        # infer模式下直接输出
         else:
             self.__logger.debug('inferring...')
 
@@ -241,7 +242,6 @@ class MainProc(Proc):
             gi, gf, ci, cf = feed.getInputdata()
             result = self.__sess.run(predict, feed_dict={self.__caustic_img: ci, self.__global_img: gi,
                                                          self.__caustic_fea: cf, self.__global_fea: gf})
-
             return result
 
         return None

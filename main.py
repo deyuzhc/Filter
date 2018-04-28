@@ -23,7 +23,8 @@ if platform.system() == 'Windows':
 def handler(sig, frame):
     sd = Shared()
     logger = sd.getLogger()
-    logger.info('...closing...patient...')
+    logger.debug("\r\r\r\r\r")
+    print('...closing...patient...')
 
     while sd.getFlag('safeExit') != 0:
         pass

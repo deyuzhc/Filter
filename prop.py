@@ -40,6 +40,7 @@ class Prop(metaclass=Singleton):
         self.__properties['cache_size'] = self.__getAttr('cache_size', 800, self.__properties['CONFIG_FILE'])
         self.__properties['batch_h'] = self.__getAttr('batch_h', 50, self.__properties['CONFIG_FILE'])
         self.__properties['batch_w'] = self.__getAttr('batch_w', 50, self.__properties['CONFIG_FILE'])
+        self.__properties['log_file'] = self.__getAttr('log_file', 'run.log', self.__properties['CONFIG_FILE'])
         self.__properties['sfeatures'] = self.__getAttr('sfeatures', 8, self.__properties['CONFIG_FILE'])
         self.__properties['ifeatures'] = self.__getAttr('ifeatures', 2, self.__properties['CONFIG_FILE'])
         assert (self.__properties['ifeatures'] == 2)
@@ -53,12 +54,11 @@ class Prop(metaclass=Singleton):
         self.__properties['weights_shape'] = self.__getAttr('weights_shape', [8, 100, 100, 100, 121],
                                                             self.__properties['CONFIG_FILE'])
         assert (len(self.__properties['active_func']) + 1 == len(self.__properties['weights_shape']))
-        # channels of image
+        # 图像通道，默认为3
         self.__properties['cols'] = self.__getAttr('cols', 3, self.__properties['CONFIG_FILE'])
-        # message queue
         self.__properties['plot_high'] = self.__getAttr('plot_high', 300, self.__properties['CONFIG_FILE'])
         self.__properties['plot_width'] = self.__getAttr('plot_width', 100, self.__properties['CONFIG_FILE'])
-        self.__properties['session'] = None  # utils.getSession()
+        self.__properties['session'] = None
         self.__properties['cache'] = Cache(self.queryAttr('cache_size'))
 
     ############################
@@ -107,21 +107,22 @@ class Prop(metaclass=Singleton):
             result += '# [optimizer]:\t\t[\'' + str(self.__properties['optimizer']) + '\']\n'
         else:
             assert (self.__properties['mode'] == 'infer')
-        result += '# [model_path]:\t\t[\'' + str(self.__properties['model_path']) + '\']\n'
-        result += '# [cnn_name]:\t\t' + str(self.__properties['cnn_name']) + '\n'
-        result += '# [ckpt_name]:\t\t[\'' + str(self.__properties['ckpt_name']) + '\']\n'
-        result += '# [data_dir]:\t\t[\'' + str(self.__properties['data_dir']) + '\']\n'
-        result += '# [conf_input]:\t\t[\'' + str(self.__properties['conf_input']) + '\']\n'
-        result += '# [ground_truth]:\t[\'' + str(self.__properties['ground_truth']) + '\']\n'
-        result += '# [cache_size]:\t\t[' + str(self.__properties['cache_size']) + 'M]\n'
-        result += '# [plot_high]:\t\t[' + str(self.__properties['plot_high']) + ']\n'
-        result += '# [plot_width]:\t\t[' + str(self.__properties['plot_width']) + ']\n'
         result += '# [batch_num]:\t\t[' + str(self.__properties['batch_n']) + ']\n'
         result += '# [batch_height]:\t[' + str(self.__properties['batch_h']) + ']\n'
         result += '# [batch_width]:\t[' + str(self.__properties['batch_w']) + ']\n'
         result += '# [conv_size]:\t\t[' + str(self.__properties['conv_size']) + ']\n'
         result += '# [sfeatures]:\t\t[' + str(self.__properties['sfeatures']) + ']\n'
         result += '# [ifeatures]:\t\t[' + str(self.__properties['ifeatures']) + ']\n'
+        result += '# [plot_high]:\t\t[' + str(self.__properties['plot_high']) + ']\n'
+        result += '# [plot_width]:\t\t[' + str(self.__properties['plot_width']) + ']\n'
+        result += '# [model_path]:\t\t[\'' + str(self.__properties['model_path']) + '\']\n'
+        result += '# [cnn_name]:\t\t' + str(self.__properties['cnn_name']) + '\n'
+        result += '# [ckpt_name]:\t\t[\'' + str(self.__properties['ckpt_name']) + '\']\n'
+        result += '# [data_dir]:\t\t[\'' + str(self.__properties['data_dir']) + '\']\n'
+        result += '# [ground_truth]:\t[\'' + str(self.__properties['ground_truth']) + '\']\n'
+        result += '# [log_file]:\t\t[\'' + str(self.__properties['log_file']) + '\']\n'
+        result += '# [conf_input]:\t\t[\'' + str(self.__properties['conf_input']) + '\']\n'
+        result += '# [cache_size]:\t\t[' + str(self.__properties['cache_size']) + 'M]\n'
         result += '# [weights_shape]:\t' + str(self.__properties['weights_shape']) + '\n'
         result += '# [active_func]:\t' + str(self.__properties['active_func']) + '\n'
         return result
