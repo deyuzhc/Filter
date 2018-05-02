@@ -40,8 +40,8 @@ class IOsched:
     '''
 
     def __init__(self, prop, batchQueue):
-        # sample this size from a scene
-        self.__sampleNum = 25
+        # 从场景中选择切片的数量
+        self.__sampleNum = 100
         sd = Shared()
         self.__logger = sd.getLogger()
         # buf size
@@ -126,7 +126,14 @@ class IOsched:
                 self.__ih = image[i].shape[1]
                 self.__iw = image[i].shape[2]
                 txt[i] = self.__getCacheItem(path + txtname)
-                txt[i] = np.reshape(txt[i],[-1, self.__ih, self.__iw, self.__sfeatures])
+                # 仅对第4，8列进行预处理
+                max3c = np.max(txt[:, 3])
+                min3c = np.min(txt[:, 3])
+                max7c = np.max(txt[:, 7])
+                min7c = np.min(txt[:, 7])
+                txt[:, 3] = (txt[:, 3] - min3c) / (max3c - min3c)
+                txt[:, 7] = (txt[:, 7] - min7c) / (max7c - min7c)
+                txt[i] = np.reshape(txt[i], [-1, self.__ih, self.__iw, self.__sfeatures])
             assert (txt[0].shape == txt[1].shape)
             assert (image[0].shape == image[1].shape)
             if self.__mode == 'train':
@@ -174,7 +181,7 @@ class IOsched:
         while True:
             if len(self.__buf) == 0:
                 continue
-            idx = np.random.randint(0,len(self.__buf))
+            idx = np.random.randint(0, len(self.__buf))
             msg = self.__buf[idx]
             self.__buf.pop(idx)
             self.__data_queue.put(msg)
@@ -230,8 +237,11 @@ class IOsched:
         ret[4] = utils.slice(scene[4], [0, sh, sw, 0], [1, bh, bw, cols])  # truth
 
         # preprocess data 
-        ret[1] = self.__Sigmoid(ret[1])
-        ret[3] = self.__Sigmoid(ret[3])
+        # ret[1] = self.__Sigmoid(ret[1])
+        # ret[3] = self.__Sigmoid(ret[3])
+
+        ret[1] = (ret[1] - ret[1].mean()) / ret[1].std()
+        ret[3] = (ret[3] - ret[3].mean()) / ret[3].std()
 
         return ret
 
