@@ -7,7 +7,7 @@
   "conv_size": 5,
   "sfeatures": 8,
   "ifeatures": 2,
-  "max_round": 2147483647,
+  "max_round": 200,
   "plot_width": 1000,
   "plot_height": 20,
   "learning_rate": 1e-2,

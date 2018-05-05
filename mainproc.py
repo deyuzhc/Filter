@@ -224,7 +224,7 @@ class MainProc(Proc):
                 self.__logger.info('round:%d of %d,loss:%f...' % (i + 1, self.__max_round, xloss))
                 # print("status: {:.2f}%".format(float((i + 1) / self.__max_round)), end="\r")
 
-                bar.update((i + 1) / self.__max_round)
+                bar.update((i + 1) / self.__max_round * 100)
 
                 # 保存结果
                 if i % self.__save_round == (self.__save_round - 1):
