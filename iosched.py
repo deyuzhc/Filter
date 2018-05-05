@@ -275,8 +275,8 @@ class IOsched:
             offset = [sh, sw]
             size = [bh, bw]
 
-            offset = [400, 400]
-            layer = 0
+            # offset = [400, 400]
+            # layer = 0
         return layer, offset, size
 
     '''
