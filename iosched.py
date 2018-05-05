@@ -127,12 +127,12 @@ class IOsched:
                 self.__iw = image[i].shape[2]
                 txt[i] = self.__getCacheItem(path + txtname)
                 # 仅对第4，8列进行预处理
-                max3c = np.max(txt[:, 3])
-                min3c = np.min(txt[:, 3])
-                max7c = np.max(txt[:, 7])
-                min7c = np.min(txt[:, 7])
-                txt[:, 3] = (txt[:, 3] - min3c) / (max3c - min3c)
-                txt[:, 7] = (txt[:, 7] - min7c) / (max7c - min7c)
+                max3c = np.max(txt[i][:, 3])
+                min3c = np.min(txt[i][:, 3])
+                max7c = np.max(txt[i][:, 7])
+                min7c = np.min(txt[i][:, 7])
+                txt[i][:, 3] = (txt[i][:, 3] - min3c) / (max3c - min3c)
+                txt[i][:, 7] = (txt[i][:, 7] - min7c) / (max7c - min7c)
                 txt[i] = np.reshape(txt[i], [-1, self.__ih, self.__iw, self.__sfeatures])
             assert (txt[0].shape == txt[1].shape)
             assert (image[0].shape == image[1].shape)
