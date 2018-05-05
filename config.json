@@ -22,7 +22,7 @@
   ],
   "ckpt_name": "model",
   "test_data": "data/test/staircase2/",
-  "train_data": "data/train/",
+  "train_data": "data/test/",
   "weights_shape": [
     10,
     100,
