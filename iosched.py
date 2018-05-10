@@ -240,8 +240,12 @@ class IOsched:
         # ret[1] = self.__Sigmoid(ret[1])
         # ret[3] = self.__Sigmoid(ret[3])
 
-        ret[1] = (ret[1] - ret[1].mean()) / ret[1].std()
-        ret[3] = (ret[3] - ret[3].mean()) / ret[3].std()
+        ret[1][:,:,:,3] = (ret[1][:,:,:,3] - np.min(ret[1][:,:,:,3])) / (np.max(ret[1][:,:,:,3]) - np.min(ret[1][:,:,:,3]))
+        ret[1][:,:,:,7] = (ret[1][:,:,:,7] - np.min(ret[1][:,:,:,7])) / (np.max(ret[1][:,:,:,7]) - np.min(ret[1][:,:,:,7]))
+        # ret[1] = (ret[1] - ret[1].mean()) / ret[1].std()
+        ret[3][:,:,:,3] = (ret[3][:,:,:,3] - np.min(ret[3][:,:,:,3])) / (np.max(ret[3][:,:,:,3]) - np.min(ret[3][:,:,:,3]))
+        ret[3][:,:,:,7] = (ret[3][:,:,:,7] - np.min(ret[3][:,:,:,7])) / (np.max(ret[3][:,:,:,7]) - np.min(ret[3][:,:,:,7]))
+        # ret[3] = (ret[3] - ret[3].mean()) / ret[3].std()
 
         return ret
 
