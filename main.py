@@ -66,8 +66,10 @@ def main(argv=None):
 
     # 主线程等待终止消息或信号
     while not sd.getFlag('nowExit'):
-        render.process()
-        pass
+        if platform.system() == 'Windows':
+            render.process()
+        else:
+            pass
 
 
 if __name__ == '__main__':
