@@ -83,16 +83,13 @@ def writeJson(content, filename):
 
 def readIMG(filename):
     image = Image.open(filename)
-    data = image.getdata()
-    result = []
-    for p in data:
-        for c in p:
-            result.append(c)
-    channels = 3
-    assert (len(result) / (image.height * image.width) == channels)
-    result = np.reshape(result, [1, image.height, image.width, channels])
-    # return result / 255
-    return result
+    result = np.array(image)
+    ih = result.shape[0]
+    iw = result.shape[1]
+    ic = result.shape[2]
+    result = np.reshape(result, [1, ih, iw, ic])
+    return result / 255
+    #return result
 
 
 '''

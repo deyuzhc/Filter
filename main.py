@@ -61,8 +61,12 @@ def main(argv=None):
     mainproc = MainProc(prop, mainfeed, msg_queue)
     mainproc.start()
 
+    # 走势图绘制
+    render = iRender(msg_queue, prop)
+
     # 主线程等待终止消息或信号
     while not sd.getFlag('nowExit'):
+        render.process()
         pass
 
 

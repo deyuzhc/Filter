@@ -56,7 +56,7 @@ class Prop(metaclass=Singleton):
         assert (len(self.__properties['active_func']) + 1 == len(self.__properties['weights_shape']))
         # 图像通道，默认为3
         self.__properties['cols'] = self.__getAttr('cols', 3, self.__properties['CONFIG_FILE'])
-        self.__properties['plot_high'] = self.__getAttr('plot_high', 300, self.__properties['CONFIG_FILE'])
+        self.__properties['plot_height'] = self.__getAttr('plot_height', 300, self.__properties['CONFIG_FILE'])
         self.__properties['plot_width'] = self.__getAttr('plot_width', 100, self.__properties['CONFIG_FILE'])
         self.__properties['session'] = None
         self.__properties['cache'] = Cache(self.queryAttr('cache_size'))
@@ -113,7 +113,7 @@ class Prop(metaclass=Singleton):
         result += '# [conv_size]:\t\t[' + str(self.__properties['conv_size']) + ']\n'
         result += '# [sfeatures]:\t\t[' + str(self.__properties['sfeatures']) + ']\n'
         result += '# [ifeatures]:\t\t[' + str(self.__properties['ifeatures']) + ']\n'
-        result += '# [plot_high]:\t\t[' + str(self.__properties['plot_high']) + ']\n'
+        result += '# [plot_height]:\t\t[' + str(self.__properties['plot_height']) + ']\n'
         result += '# [plot_width]:\t\t[' + str(self.__properties['plot_width']) + ']\n'
         result += '# [model_path]:\t\t[\'' + str(self.__properties['model_path']) + '\']\n'
         result += '# [cnn_name]:\t\t' + str(self.__properties['cnn_name']) + '\n'

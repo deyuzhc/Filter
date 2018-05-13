@@ -14,7 +14,7 @@ from shared import Shared
 from matplotlib import pyplot as plt
 
 
-class iRender(Proc):
+class iRender:
     '''
     @about
         交互式绘图构造函数
@@ -26,7 +26,7 @@ class iRender(Proc):
 
     def __init__(self, queue, prop=None):
         self.__low = 0
-        self.__high = 300 if prop == None else prop.queryAttr('plot_high')
+        self.__high = 300 if prop == None else prop.queryAttr('plot_height')
 
         self.__left = 0
         self.__right = 100 if prop == None else prop.queryAttr('plot_width')
@@ -43,7 +43,7 @@ class iRender(Proc):
         self.__ys = [self.__high, self.__high]
 
     def process(self, input1=None, input2=None):
-        self.__logger.debug('waiting...')
+        # self.__logger.debug('waiting...')
         rx, y = self.__feed.next_batch()
         x = int((self.__right - self.__low) * rx)
         self.__xs[0] = self.__xs[1]
@@ -53,7 +53,7 @@ class iRender(Proc):
         plt.plot(self.__xs, self.__ys, color='b', linewidth=1)
 
         # pause,some sec
-        plt.pause(1e-6)
+        plt.pause(1)
 
 
 class iRenderFeed(Feed):

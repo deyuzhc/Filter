@@ -194,7 +194,6 @@ class MainProc(Proc):
             loss = tf.reduce_mean(tf.abs(tf.subtract(predict, truth)))
             step = tf.train.AdamOptimizer(self.__learning_rate).minimize(loss)
 
-            print('initializing...')
             # 随机初始化两网络
             # self.__sess.run(tf.global_variables_initializer())
             self.__globalCNN.init(ckpt_global)

@@ -7,7 +7,6 @@ IO调度模块，用于cache管理
     此模块的主要任务是开启文件加载线程
     将文件切分为batch粒度，放入训练数据消息队列
     训练时，feed模块从队列中获取，使cache透明
-    将所有场景文件组织为一个环形链
     长时间调用此模块后，可保证所有场景有近似的访问频率
 
 基本策略：
@@ -240,11 +239,15 @@ class IOsched:
         # ret[1] = self.__Sigmoid(ret[1])
         # ret[3] = self.__Sigmoid(ret[3])
 
-        ret[1][:,:,:,3] = (ret[1][:,:,:,3] - np.min(ret[1][:,:,:,3])) / (np.max(ret[1][:,:,:,3]) - np.min(ret[1][:,:,:,3]))
-        ret[1][:,:,:,7] = (ret[1][:,:,:,7] - np.min(ret[1][:,:,:,7])) / (np.max(ret[1][:,:,:,7]) - np.min(ret[1][:,:,:,7]))
+        ret[1][:, :, :, 3] = (ret[1][:, :, :, 3] - np.min(ret[1][:, :, :, 3])) / (
+                    np.max(ret[1][:, :, :, 3]) - np.min(ret[1][:, :, :, 3]))
+        ret[1][:, :, :, 7] = (ret[1][:, :, :, 7] - np.min(ret[1][:, :, :, 7])) / (
+                    np.max(ret[1][:, :, :, 7]) - np.min(ret[1][:, :, :, 7]))
         # ret[1] = (ret[1] - ret[1].mean()) / ret[1].std()
-        ret[3][:,:,:,3] = (ret[3][:,:,:,3] - np.min(ret[3][:,:,:,3])) / (np.max(ret[3][:,:,:,3]) - np.min(ret[3][:,:,:,3]))
-        ret[3][:,:,:,7] = (ret[3][:,:,:,7] - np.min(ret[3][:,:,:,7])) / (np.max(ret[3][:,:,:,7]) - np.min(ret[3][:,:,:,7]))
+        ret[3][:, :, :, 3] = (ret[3][:, :, :, 3] - np.min(ret[3][:, :, :, 3])) / (
+                    np.max(ret[3][:, :, :, 3]) - np.min(ret[3][:, :, :, 3]))
+        ret[3][:, :, :, 7] = (ret[3][:, :, :, 7] - np.min(ret[3][:, :, :, 7])) / (
+                    np.max(ret[3][:, :, :, 7]) - np.min(ret[3][:, :, :, 7]))
         # ret[3] = (ret[3] - ret[3].mean()) / ret[3].std()
 
         return ret
@@ -279,8 +282,8 @@ class IOsched:
             offset = [sh, sw]
             size = [bh, bw]
 
-            # offset = [400, 400]
-            # layer = 0
+            offset = [400, 400]
+            layer = 0
         return layer, offset, size
 
     '''
