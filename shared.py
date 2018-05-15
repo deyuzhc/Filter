@@ -108,8 +108,8 @@ class Shared(metaclass=Singleton):
         except:
             self.__vars['logger'] = logging.getLogger()
             fmt = logging.Formatter('[%(asctime)s][%(threadName)s][%(levelname)s][%(module)s] %(message)s')
-            # handler = logging.FileHandler("run.log")
-            handler = logging.StreamHandler(sys.stdout)
+            handler = logging.FileHandler("run.log")
+            # handler = logging.StreamHandler(sys.stdout)
             handler.setFormatter(fmt)
             self.__vars['logger'].addHandler(handler)
             self.__vars['logger'].setLevel(logging.DEBUG)

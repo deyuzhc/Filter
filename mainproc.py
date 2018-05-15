@@ -219,7 +219,8 @@ class MainProc(Proc):
                 #                                            self.__caustic_fea: cf, self.__global_fea: gf,
                 #                                            truth: gt})
                 # utils.displayImage(xpred)
-
+		
+                print('round:%d of %d,loss: %f...'%(i + 1, self.__max_round, xloss))
                 self.__logger.info('round:%d of %d,loss:%f...' % (i + 1, self.__max_round, xloss))
                 # print("status: {:.2f}%".format(float((i + 1) / self.__max_round)), end="\r")
 

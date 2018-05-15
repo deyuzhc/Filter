@@ -62,7 +62,8 @@ def main(argv=None):
     mainproc.start()
 
     # 走势图绘制
-    render = iRender(msg_queue, prop)
+    if platform.system() == 'Windows':
+        render = iRender(msg_queue, prop)
 
     # 主线程等待终止消息或信号
     while not sd.getFlag('nowExit'):
