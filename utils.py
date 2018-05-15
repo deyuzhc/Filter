@@ -89,7 +89,7 @@ def readIMG(filename):
     ic = result.shape[2]
     result = np.reshape(result, [1, ih, iw, ic])
     return result / 255
-    #return result
+    # return result
 
 
 '''
@@ -274,7 +274,7 @@ def saveImage(data, filename):
     sd = Shared()
     sd.incFlag('safeExit')
     logger = sd.getLogger()
-    src = data.astype(np.uint8)
+    src = (data * 255).astype(np.uint8)
     if len(src.shape) == 4:
         assert (src.shape[0]) == 1
         h = src.shape[1]

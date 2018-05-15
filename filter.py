@@ -161,10 +161,13 @@ class Filter(Proc):
         bw = img.shape[2]
 
         # 数据激活
+
         cnn_mul = cnn_output * cnn_output
         cnn_sum = tf.reduce_sum(cnn_mul, -1)
         cnn_sum = tf.reshape(cnn_sum, [bn, bh, bw, 1])
         filters = cnn_mul / cnn_sum * 0.5
+
+        #filters = self.softmax(cnn_output) * 0.5
 
         assert (len(img.shape) == 4)
         return img, filters

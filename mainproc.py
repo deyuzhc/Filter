@@ -194,8 +194,7 @@ class MainProc(Proc):
             loss = tf.reduce_mean(tf.abs(tf.subtract(predict, truth)))
             step = tf.train.AdamOptimizer(self.__learning_rate).minimize(loss)
 
-            # 随机初始化两网络
-            # self.__sess.run(tf.global_variables_initializer())
+            # 恢复与随机初始化两网络
             self.__globalCNN.init(ckpt_global)
             self.__causticCNN.init(ckpt_caustic)
 
@@ -216,9 +215,10 @@ class MainProc(Proc):
 
                 self.sendMsg([i / self.__max_round, xloss])
 
-                # xpred = self.__sess.run(predict,feed_dict={self.__caustic_img:ci,self.__global_img:gi,
-                #                                        self.__caustic_fea:cf,self.__global_fea:gf,
-                #                                        truth:gt})
+                # xpred = self.__sess.run(predict, feed_dict={self.__caustic_img: ci, self.__global_img: gi,
+                #                                            self.__caustic_fea: cf, self.__global_fea: gf,
+                #                                            truth: gt})
+                # utils.displayImage(xpred)
 
                 self.__logger.info('round:%d of %d,loss:%f...' % (i + 1, self.__max_round, xloss))
                 # print("status: {:.2f}%".format(float((i + 1) / self.__max_round)), end="\r")
@@ -235,6 +235,7 @@ class MainProc(Proc):
         else:
             self.__logger.debug('inferring...')
 
+            # 恢复与随机初始化两网络
             self.__globalCNN.init(ckpt_global)
             self.__causticCNN.init(ckpt_caustic)
 

@@ -273,7 +273,7 @@ class IOsched:
         tn = scene[txtkey].shape[0]
         layer = np.random.randint(0, tn)
         if self.__mode == 'infer':
-            offset = [0, 0]
+            offset = [250, 200]
             size = [ih, iw]
         else:
             assert (self.__mode == 'train')
@@ -282,8 +282,8 @@ class IOsched:
             offset = [sh, sw]
             size = [bh, bw]
 
-            # offset = [400, 400]
-            # layer = 0
+            #offset = [500, 500]
+            #layer = 0
         return layer, offset, size
 
     '''
