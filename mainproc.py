@@ -201,7 +201,7 @@ class MainProc(Proc):
             # 用于绘制进度条
             bar = LineProgress(title='status', total=self.__max_round)
 
-            self.__save_round = 100
+            self.__save_round = 1000
             # 训练
             for i in range(self.__max_round):
 
