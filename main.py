@@ -2,7 +2,6 @@
 # encoding:utf-8
 '''
 创建各类的对象，并调用完成任务
-
 '''
 
 from prop import Prop

@@ -152,6 +152,16 @@ class IOsched:
             del txt
             del image
 
+            # 数据预处理
+            nmin = np.min(scene[1][:, 3])
+            scene[1][:, 3] = (scene[1][:, 3] - nmin) / (np.max(scene[1][:, 3]) - nmin)
+            nmin = np.min(scene[1][:, 7])
+            scene[1][:, 7] = (scene[1][:, 7] - nmin) / (np.max(scene[1][:, 7]) - nmin)
+            nmin = np.min(scene[3][:, 3])
+            scene[3][:, 3] = (scene[3][:, 3] - nmin) / (np.max(scene[3][:, 3]) - nmin)
+            nmin = np.min(scene[3][:, 7])
+            scene[3][:, 7] = (scene[3][:, 7] - nmin) / (np.max(scene[3][:, 7]) - nmin)
+
             for i in range(self.__sampleNum):
                 # 对场景进行切片时的参数
                 layer, offset, size = self.__getSplitParams(scene)
@@ -239,18 +249,18 @@ class IOsched:
         # ret[1] = self.__Sigmoid(ret[1])
         # ret[3] = self.__Sigmoid(ret[3])
 
-        base = np.max(ret[1][:, :, :, 3]) - np.min(ret[1][:, :, :, 3])
-        if base == 0: base = np.sum(ret[1][:, :, :, 3])
-        ret[1][:, :, :, 3] = (ret[1][:, :, :, 3] - np.min(ret[1][:, :, :, 3])) / (base)
-        base = np.max(ret[1][:, :, :, 7]) - np.min(ret[1][:, :, :, 7])
-        if base == 0: base = np.sum(ret[1][:, :, :, 7])
-        ret[1][:, :, :, 7] = (ret[1][:, :, :, 7] - np.min(ret[1][:, :, :, 7])) / (base)
-        base = np.max(ret[3][:, :, :, 3]) - np.min(ret[3][:, :, :, 3])
-        if base == 0: base = np.sum(ret[3][:, :, :, 3])
-        ret[3][:, :, :, 3] = (ret[3][:, :, :, 3] - np.min(ret[3][:, :, :, 3])) / (base)
-        base = np.max(ret[3][:, :, :, 7]) - np.min(ret[3][:, :, :, 7])
-        if base == 0: base = np.sum(ret[3][:, :, :, 7])
-        ret[3][:, :, :, 7] = (ret[3][:, :, :, 7] - np.min(ret[3][:, :, :, 7])) / (base)
+        # base = np.max(ret[1][:, :, :, 3]) - np.min(ret[1][:, :, :, 3])
+        # if base == 0: base = np.sum(ret[1][:, :, :, 3])
+        # ret[1][:, :, :, 3] = (ret[1][:, :, :, 3] - np.min(ret[1][:, :, :, 3])) / (base)
+        # base = np.max(ret[1][:, :, :, 7]) - np.min(ret[1][:, :, :, 7])
+        # if base == 0: base = np.sum(ret[1][:, :, :, 7])
+        # ret[1][:, :, :, 7] = (ret[1][:, :, :, 7] - np.min(ret[1][:, :, :, 7])) / (base)
+        # base = np.max(ret[3][:, :, :, 3]) - np.min(ret[3][:, :, :, 3])
+        # if base == 0: base = np.sum(ret[3][:, :, :, 3])
+        # ret[3][:, :, :, 3] = (ret[3][:, :, :, 3] - np.min(ret[3][:, :, :, 3])) / (base)
+        # base = np.max(ret[3][:, :, :, 7]) - np.min(ret[3][:, :, :, 7])
+        # if base == 0: base = np.sum(ret[3][:, :, :, 7])
+        # ret[3][:, :, :, 7] = (ret[3][:, :, :, 7] - np.min(ret[3][:, :, :, 7])) / (base)
 
         return ret
 
