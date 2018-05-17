@@ -266,6 +266,7 @@ class MainProc(Proc):
             # utils.displayImage(input)
 
         sd.setFlag('nowExit', True)
+        print('done')
 
 
 '''
