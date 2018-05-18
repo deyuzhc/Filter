@@ -194,8 +194,6 @@ class MainProc(Proc):
         print(filename)
         try:
             obj = utils.readJson(filename)
-            print(obj)
-            print(obj['iterations'], type(obj['iterations']))
             obj['iterations'] += self.__save_round
         except:
             obj = {}

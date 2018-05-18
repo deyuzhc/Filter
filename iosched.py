@@ -40,7 +40,7 @@ class IOsched:
 
     def __init__(self, prop, batchQueue):
         # 从场景中选择切片的数量
-        self.__sampleNum = 100
+        self.__sampleNum = 40
         sd = Shared()
         self.__logger = sd.getLogger()
         # buf size
