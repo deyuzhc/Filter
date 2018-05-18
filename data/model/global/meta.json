@@ -1,6 +1,6 @@
 {
   "name": "data/model//global/meta.json",
-  "iterations": 2,
+  "iterations": 95000,
   "active_func": [
     "leaky_relu",
     "leaky_relu",

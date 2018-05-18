@@ -29,8 +29,10 @@
         [conv_size] 各层卷积核大小
         [sfeatures] 场景空间特征数量
         [ifeatures] 图像空间特征数量
-        [weights_shape] 各层卷积核数量
+        [loss_func] 损失函数
+        [optimizer] 优化器
         [active_func] 各层激活函数
+        [weights_shape] 各层卷积核数量
 
     ·程序运行参数
         [mode] 运行模式，分infer和train两种
@@ -41,19 +43,25 @@
         [loss_func] 损失函数
         [max_round] 训练次数
         [learning_rate] 学习率
+        [save_round] 迭代一定步数后保存
 
     ·程序输入数据
         [test_data] infer模式下的输入数据
         [train_data] train模式下的输入数据
         [ground_truth] 理想无噪图
 
-    ·训练结果存储
+    ·存储相关
         [model_path] checkpoint存储路径
         [ckpt_name] checkpoint文件名
+        [meta_name] checkpoint相关元数据
 
     ·训练效果显示
         [plot_width] 显示窗口宽度
         [plot_height] 显示窗口高度
+
+    ·其它
+        [cache_size] 缓存大小
+        [log_file] 日志输出文件
 
 ## 模块说明:
 
@@ -79,7 +87,7 @@
 		存储全局共享变量
 	·singleton.py
 		单例模式类
-	·test.py
-		读取run.log中的误差数据以折线图显示
 	·utils.py
 		提供文件读写，图像显示等通用功能
+	·test.py
+		读取run.log中的误差数据以折线图显示
