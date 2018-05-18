@@ -84,6 +84,7 @@ class MainProc(Proc):
 
         # other configuration in train mode
         if self.__isTrain:
+            self.__meta_name = self.__prop.queryAttr('meta_name')
             self.__loss_func = self.__prop.queryAttr('loss_func')
             self.__optimizer = self.__prop.queryAttr('optimizer')
             self.__max_round = self.__prop.queryAttr('max_round')
@@ -184,6 +185,28 @@ class MainProc(Proc):
         return result
 
     '''
+    @param
+    @about
+    @return
+    '''
+
+    def __updateMeta(self, filename):
+        print(filename)
+        try:
+            obj = utils.readJson(filename)
+            print(obj)
+            print(obj['iterations'], type(obj['iterations']))
+            obj['iterations'] += self.__save_round
+        except:
+            obj = {}
+            obj['name'] = filename
+            obj['iterations'] = self.__save_round
+            obj['active_func'] = self.__prop.queryAttr('active_func')
+            obj['weights_shape'] = self.__prop.queryAttr('weights_shape')
+
+        utils.writeJson(obj, filename)
+
+    '''
     @about
         两个卷积网络进行滤波，然后合并结果
     @param
@@ -200,21 +223,8 @@ class MainProc(Proc):
         caus = self.__causticCNN.process(Filter(prop))
 
         assert (glob.shape == caus.shape)
-        # predict should be clipped to [0,255]
         predict = glob + caus
-        # predict = caus
 
-        '''
-        pmax = tf.reduce_max(predict,-1)
-        n = psum.shape[0]
-        h = psum.shape[1]
-        w = psum.shape[2]
-        pmax = tf.reshape(pmax,[n,h,w,1])
-        
-        # scale each channel to [0,255]
-        predict = predict / pmax * 255
-        '''
-        # self.__predict = predict
         return predict
 
     '''
@@ -280,6 +290,10 @@ class MainProc(Proc):
                 if i % self.__save_round == (self.__save_round - 1):
                     self.__globalCNN.save(ckpt_global, self.__ckpt_name, self.__save_round)
                     self.__causticCNN.save(ckpt_caustic, self.__ckpt_name, self.__save_round)
+                    for cnn in self.__cnn_name:
+                        path = self.__model_path + '/' + cnn + '/' + self.__meta_name
+                        self.__updateMeta(path)
+
 
 
         # infer模式下直接输出
@@ -318,10 +332,9 @@ class MainProc(Proc):
         sd.setFlag('nowExit', True)
         print('done')
 
-
-'''
-配合mainproc对象使用，为其提供数据
-'''
+    '''
+    配合mainproc对象使用，为其提供数据
+    '''
 
 
 class MainFeed(Feed):
@@ -414,6 +427,7 @@ class MainFeed(Feed):
 
     def next_batch(self):
         ret = self.__data_queue.get()
+
         assert (len(ret) == 5)
         gi = ret[0]
         gf = ret[1]
@@ -426,9 +440,9 @@ class MainFeed(Feed):
     @about
         文件校验
     @param
-        
+    
     @return
-       True/False 
+    True/False 
     '''
 
     def checkMatch(self, a, b, c):
@@ -446,6 +460,7 @@ class MainFeed(Feed):
 
     def getInputdata(self):
         ret = self.__data_queue.get()
+
         gi = ret[0]
         gf = ret[1]
         ci = ret[2]

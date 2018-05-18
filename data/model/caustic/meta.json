@@ -1,1 +1,21 @@
-{"round": 2000, "weights": "tmp", "active_func": "tmp", "name": "model"}
+{
+  "name": "data/model//caustic/meta.json",
+  "iterations": 2,
+  "active_func": [
+    "leaky_relu",
+    "leaky_relu",
+    "leaky_relu",
+    "leaky_relu",
+    "leaky_relu",
+    "leaky_relu"
+  ],
+  "weights_shape": [
+    10,
+    100,
+    100,
+    100,
+    100,
+    100,
+    169
+  ]
+}

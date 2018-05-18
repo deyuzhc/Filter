@@ -68,7 +68,7 @@ def writeJson(content, filename):
     isinstance(content, dict)
     with open(filename, 'w') as f:
         json.dump(content, f)
-    return True
+    return
 
 
 '''

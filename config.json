@@ -8,7 +8,7 @@
   "sfeatures": 8,
   "ifeatures": 2,
   "max_round": 500000,
-  "save_round": 1000,
+  "save_round": 1,
   "plot_width": 100,
   "plot_height": 0.2,
   "learning_rate": 1e-2,
@@ -22,8 +22,9 @@
     "caustic"
   ],
   "ckpt_name": "model",
+  "meta_name": "meta.json",
   "test_data": "data/train/bedroom/",
-  "train_data": "data/train/",
+  "train_data": "data/test/",
   "weights_shape": [
     10,
     100,

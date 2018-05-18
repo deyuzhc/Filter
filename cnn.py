@@ -210,17 +210,6 @@ class CNN:
                 return False
         saver = tf.train.Saver()
         saver.save(self.__sess, path + name)
-        try:
-            meta = utils.readJson(path + + 'meta.json')
-        except:
-            meta = {}
-            meta['name'] = name
-            meta['weights'] = 'tmp'
-            meta['active_func'] = 'tmp'
-            meta['round'] = save_round
-
-        meta['round'] += save_round
-        utils.writeJson(meta, path + 'meta.json')
         self.__logger.info('model[%s] saved.' % self.__name)
         sd.decFlag('safeExit')
         return True

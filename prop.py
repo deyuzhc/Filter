@@ -50,6 +50,7 @@ class Prop(metaclass=Singleton):
         self.__properties['ckpt_name'] = self.__getAttr('ckpt_name', 'model', self.__properties['CONFIG_FILE'])
         self.__properties['cnn_name'] = self.__getAttr('cnn_name', ['global', 'caustic'],
                                                        self.__properties['CONFIG_FILE'])
+        self.__properties['meta_name'] = self.__getAttr('meta_name', 'meta.json', self.__properties['CONFIG_FILE'])
         self.__properties['active_func'] = self.__getAttr('active_func', ['relu', 'sigmoid', 'relu', 'sigmoid'],
                                                           self.__properties['CONFIG_FILE'])
         self.__properties['weights_shape'] = self.__getAttr('weights_shape', [8, 100, 100, 100, 121],
@@ -119,6 +120,7 @@ class Prop(metaclass=Singleton):
         result += '# [plot_width]:\t\t[' + str(self.__properties['plot_width']) + ']\n'
         result += '# [model_path]:\t\t[\'' + str(self.__properties['model_path']) + '\']\n'
         result += '# [cnn_name]:\t\t' + str(self.__properties['cnn_name']) + '\n'
+        result += '# [meta_name]:\t\t[\'' + str(self.__properties['meta_name']) + '\']\n'
         result += '# [ckpt_name]:\t\t[\'' + str(self.__properties['ckpt_name']) + '\']\n'
         result += '# [data_dir]:\t\t[\'' + str(self.__properties['data_dir']) + '\']\n'
         result += '# [ground_truth]:\t[\'' + str(self.__properties['ground_truth']) + '\']\n'
