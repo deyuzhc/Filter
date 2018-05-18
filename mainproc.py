@@ -12,7 +12,7 @@ from proc import Proc
 from proc import Feed
 from filter import Filter
 from shared import Shared
-from eprogress import LineProgress
+# from eprogress import LineProgress
 from filter import FilterFeed
 from threading import Thread
 from cnn import CNN
@@ -84,7 +84,9 @@ class MainProc(Proc):
 
         # other configuration in train mode
         if self.__isTrain:
+            self.__loss_func = self.__prop.queryAttr('loss_func')
             self.__max_round = self.__prop.queryAttr('max_round')
+            self.__save_round = self.__prop.queryAttr('save_round')
             self.__learning_rate = self.__prop.queryAttr('learning_rate')
 
     '''
@@ -133,6 +135,28 @@ class MainProc(Proc):
             self.__msg_queue.put(msg)
         except:
             self.__logger.error('message queue is not specified.')
+
+    '''
+        @about
+            优化器
+        @param
+            loss:损失值
+            learning_rate:学习率
+            type:优化器类型
+        @return
+            优化器
+    '''
+
+    def __getOptimizer(self, loss, learning_rate, type):
+        self.__logger.debug('building optimizer...')
+        if type == 'Adam':
+            result = tf.train.AdamOptimizer(learning_rate).minimize(loss)
+        elif type == 'Gradient':
+            result = tf.train.GradientDescentOptimizer(learning_rate).minimize(loss)
+        else:
+            raise NotImplementedError
+        self.__logger.debug('optimizer built.')
+        return result
 
     '''
     @about
@@ -192,16 +216,16 @@ class MainProc(Proc):
 
             truth = tf.placeholder(tf.float32, ishape)
             loss = tf.reduce_mean(tf.abs(tf.subtract(predict, truth)))
-            step = tf.train.AdamOptimizer(self.__learning_rate).minimize(loss)
+            # step = tf.train.AdamOptimizer(self.__learning_rate).minimize(loss)
+            step = self.__getOptimizer(loss, self.__learning_rate, self.__loss_func)
 
             # 恢复与随机初始化两网络
             self.__globalCNN.init(ckpt_global)
             self.__causticCNN.init(ckpt_caustic)
 
             # 用于绘制进度条
-            bar = LineProgress(title='status', total=self.__max_round)
+            # bar = LineProgress(title='status', total=self.__max_round)
 
-            self.__save_round = 1000
             # 训练
             for i in range(self.__max_round):
 
@@ -219,8 +243,8 @@ class MainProc(Proc):
                 #                                            self.__caustic_fea: cf, self.__global_fea: gf,
                 #                                            truth: gt})
                 # utils.displayImage(xpred)
-		
-                print('round:%d of %d,loss: %f...'%(i + 1, self.__max_round, xloss))
+
+                print('round:%d of %d,loss: %f...' % (i + 1, self.__max_round, xloss))
                 self.__logger.info('round:%d of %d,loss:%f...' % (i + 1, self.__max_round, xloss))
                 # print("status: {:.2f}%".format(float((i + 1) / self.__max_round)), end="\r")
 

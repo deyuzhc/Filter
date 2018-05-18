@@ -299,7 +299,7 @@ class CNN:
         truth = self.__getHolder(truth, in1shape)
 
         loss = self.__loss(predict, truth, self.__loss_func)
-        step = self.__optimizer(loss, self.__learning_rate, self.__optimizer)
+        step = self.getOptimizer(loss, self.__learning_rate, self.__optimizer)
 
         self.init()
 
@@ -411,7 +411,7 @@ class CNN:
         elif type == 'leaky_relu':
             return tf.nn.leaky_relu(input)
         else:
-            assert (False)
+            raise NotImplementedError
 
     '''
     @about
@@ -451,13 +451,13 @@ class CNN:
         优化器
     '''
 
-    def __optimizer(self, loss, learning_rate, type):
+    def getOptimizer(self, loss, learning_rate, type):
         self.__logger.debug('building optimizer...')
         if type == 'Adam':
             result = tf.train.AdamOptimizer(learning_rate).minimize(loss)
         elif type == 'Gradient':
             result = tf.train.GradientDescentOptimizer(learning_rate).minimize(loss)
         else:
-            assert (False)
+            raise NotImplementedError
         self.__logger.debug('optimizer built.')
         return result

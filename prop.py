@@ -19,6 +19,7 @@ class Prop(metaclass=Singleton):
         if self.__properties['mode'] == 'train':
             self.__properties['learning_rate'] = self.__getAttr('learning_rate', 1e-4, self.__properties['CONFIG_FILE'])
             self.__properties['max_round'] = self.__getAttr('max_round', 8e+3, self.__properties['CONFIG_FILE'])
+            self.__properties['save_round'] = self.__getAttr('save_round', 100, self.__properties['CONFIG_FILE'])
             self.__properties['batch_n'] = self.__getAttr('batch_n', 1, self.__properties['CONFIG_FILE'])
             self.__properties['data_dir'] = self.__getAttr('train_data', 'data/train/',
                                                            self.__properties['CONFIG_FILE'])
@@ -99,9 +100,10 @@ class Prop(metaclass=Singleton):
 
     def toString(self):
         result = '\n\n\t\t[Properties]:\n'
-        result += '# [mode]:\t\t[\'' + self.__properties['mode'] + '\']\n'
+        result += '# [mode]:\t\t\t[\'' + self.__properties['mode'] + '\']\n'
         if self.__properties['mode'] == 'train':
             result += '# [max_round]:\t\t[' + str(self.__properties['max_round']) + ']\n'
+            result += '# [save_round]:\t\t[' + str(self.__properties['save_round']) + ']\n'
             result += '# [learning_rate]:\t[' + str(self.__properties['learning_rate']) + ']\n'
             result += '# [loss_func]:\t\t[\'' + str(self.__properties['loss_func']) + '\']\n'
             result += '# [optimizer]:\t\t[\'' + str(self.__properties['optimizer']) + '\']\n'
