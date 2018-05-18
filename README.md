@@ -80,6 +80,6 @@
 	·singleton.py
 		单例模式类
 	·test.py
-		测试程序流程
+		读取run.log中的误差数据以折线图显示
 	·utils.py
 		提供文件读写，图像显示等通用功能
