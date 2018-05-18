@@ -398,8 +398,6 @@ class CNN:
     '''
 
     def __active(self, input, type):
-        lst = ['relu', 'leaky_relu', 'softmax', 'sigmoid', 'tanh']
-        assert (type in lst)
         if type == 'relu':
             return tf.nn.relu(input)
         elif type == 'sigmoid':
@@ -426,8 +424,6 @@ class CNN:
 
     def __loss(self, input, output, type='l1'):
         self.__logger.debug('computing loss...')
-        lst = ['l1', 'cross_entropy']
-        assert (type in lst)
         assert (isinstance(input, Tensor))
         assert (input.shape == output.shape)
         if type == 'l1':

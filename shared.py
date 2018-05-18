@@ -124,7 +124,7 @@ class Shared(metaclass=Singleton):
         queue
     '''
 
-    def getQueue(self, name='default', size=5):
+    def getQueue(self, name='default', size=120):
         try:
             return self.__vars['queue'][name]
         except:
