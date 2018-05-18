@@ -85,6 +85,7 @@ class MainProc(Proc):
         # other configuration in train mode
         if self.__isTrain:
             self.__loss_func = self.__prop.queryAttr('loss_func')
+            self.__optimizer = self.__prop.queryAttr('optimizer')
             self.__max_round = self.__prop.queryAttr('max_round')
             self.__save_round = self.__prop.queryAttr('save_round')
             self.__learning_rate = self.__prop.queryAttr('learning_rate')
@@ -137,25 +138,49 @@ class MainProc(Proc):
             self.__logger.error('message queue is not specified.')
 
     '''
-        @about
-            优化器
-        @param
-            loss:损失值
-            learning_rate:学习率
-            type:优化器类型
-        @return
-            优化器
+    @about
+        优化器
+    @param
+        loss:损失值
+        learning_rate:学习率
+        type:优化器类型
+    @return
+        优化器
     '''
 
     def __getOptimizer(self, loss, learning_rate, type):
         self.__logger.debug('building optimizer...')
-        if type == 'Adam':
+        if type.lower() == 'adam':
             result = tf.train.AdamOptimizer(learning_rate).minimize(loss)
-        elif type == 'Gradient':
+        elif type.lower() == 'gradient':
             result = tf.train.GradientDescentOptimizer(learning_rate).minimize(loss)
         else:
             raise NotImplementedError
         self.__logger.debug('optimizer built.')
+        return result
+
+    '''
+    @about
+        损失函数，根据指定误差计算方式计算误差
+    @param
+        input:预测值
+        output:目标值
+        type:损失函数类型
+    @return
+        损失值
+    '''
+
+    def __getLoss(self, input, output, type='l1'):
+        self.__logger.debug('computing loss...')
+        assert (input.shape == output.shape)
+        if type == 'l1':
+            result = tf.reduce_mean(tf.abs(tf.subtract(input, output)))
+        elif type == 'cross_entropy':
+            # 此方式表现不佳
+            result = tf.reduce_mean(-tf.reduce_sum(output * tf.log(input)))
+        else:
+            raise NotImplementedError
+        self.__logger.debug('loss computed.')
         return result
 
     '''
@@ -215,9 +240,10 @@ class MainProc(Proc):
             self.__logger.debug('training...')
 
             truth = tf.placeholder(tf.float32, ishape)
-            loss = tf.reduce_mean(tf.abs(tf.subtract(predict, truth)))
+            # loss = tf.reduce_mean(tf.abs(tf.subtract(predict, truth)))
+            loss = self.__getLoss(predict, truth, self.__loss_func)
             # step = tf.train.AdamOptimizer(self.__learning_rate).minimize(loss)
-            step = self.__getOptimizer(loss, self.__learning_rate, self.__loss_func)
+            step = self.__getOptimizer(loss, self.__learning_rate, self.__optimizer)
 
             # 恢复与随机初始化两网络
             self.__globalCNN.init(ckpt_global)

@@ -436,7 +436,7 @@ class CNN:
             # 此方式表现不佳
             result = tf.reduce_mean(-tf.reduce_sum(output * tf.log(input)))
         else:
-            assert (False)
+            raise NotImplementedError
         self.__logger.debug('loss computed.')
         return result
 

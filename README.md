@@ -2,7 +2,7 @@
 
 ## 简介:
 
-双卷积网络，分焦散光子和全局光子分别处理
+    双卷积网络，分焦散光子和全局光子分别处理
 
 ## 依赖项:
 
@@ -13,7 +13,6 @@
         4.Scipy
         5.Pillow
         6.Colorama
-        7.eprogress
 
     [Windows]:
         *matplotlib
@@ -27,37 +26,34 @@
     config.json
 
     ·卷积网络结构
-        [conv_size]
-        [sfeatures]
-        [ifeatures]
-        [weights_shape]
-        [active_func]
+        [conv_size] 各层卷积核大小
+        [sfeatures] 场景空间特征数量
+        [ifeatures] 图像空间特征数量
+        [weights_shape] 各层卷积核数量
+        [active_func] 各层激活函数
 
     ·程序运行参数
-        [mode]
-        [batch_n]
-        [batch_h]
-        [batch_w]
-        [cnn_name]
-        [loss_func]
-        [max_round]
-        [learning_rate]
+        [mode] 运行模式，分infer和train两种
+        [batch_n] 训练时切片数量
+        [batch_h] 训练时切片高度
+        [batch_w] 训练时切片宽度
+        [cnn_name] 子网络名称
+        [loss_func] 损失函数
+        [max_round] 训练次数
+        [learning_rate] 学习率
 
     ·程序输入数据
-        [test_data]
-        [train_data]
-        [ground_truth]
+        [test_data] infer模式下的输入数据
+        [train_data] train模式下的输入数据
+        [ground_truth] 理想无噪图
 
     ·训练结果存储
-        [model_path]
-        [ckpt_name]
+        [model_path] checkpoint存储路径
+        [ckpt_name] checkpoint文件名
 
     ·训练效果显示
-        [plot_width]
-        [plot_height]
-
-    ·其它参数
-        [cache_size]
+        [plot_width] 显示窗口宽度
+        [plot_height] 显示窗口高度
 
 ## 模块说明:
 
